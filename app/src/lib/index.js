@@ -20,10 +20,10 @@ andika("Karibu kwenye Nuru - lugha ya programu ya Kiswahili")`,
 namba1 = namba(jaza("Ingiza namba ya kwanza"))
 namba2 = namba(jaza("Ingiza namba ya pili"))
 
-andika("Jumla: " + (namba1 + namba2))
-andika("Tofauti: " + (namba1 - namba2))
-andika("Bidhaa: " + (namba1 * namba2))
-andika("Mgawanyo: " + (namba1 / namba2))`,
+andika("Jumla: " , (namba1 + namba2))
+andika("Tofauti: " , (namba1 - namba2))
+andika("Bidhaa: " , (namba1 * namba2))
+andika("Mgawanyo: " , (namba1 / namba2))`,
 		output: 'Jumla: 15\nTofauti: 5\nBidhaa: 50\nMgawanyo: 2'
 	},
 	loop: {
@@ -34,8 +34,11 @@ andika("Mgawanyo: " + (namba1 / namba2))`,
 
 idadi = namba(jaza("Hadi namba gani?"))
 
-kwa i = 1 hadi idadi {
-  andika("Namba: " + i)
+fanya i = 1
+
+wakati(i <= idadi) {
+  andika("Namba: " , i)
+  i++
 }
 
 andika("Tumemaliza!")`,
@@ -58,7 +61,7 @@ fanya factorial = unda(n) {
 namba = namba(jaza("Ingiza namba"))
 matokeo = factorial(namba)
 
-andika("Factorial ya " + namba + " ni " + matokeo)`,
+andika("Factorial ya " , namba , " ni " , matokeo)`,
 		output: 'Factorial ya 5 ni 120'
 	},
 		fibonacci: {

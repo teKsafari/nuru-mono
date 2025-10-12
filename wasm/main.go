@@ -35,8 +35,8 @@ func Read(contents string) {
 	program := p.ParseProgram()
 
 	if len(p.Errors()) != 0 {
-		fmt.Println("Kuna Errors Zifuatazo:")
-		jsOutputReceiverFunction.Invoke("Kuna Errors Zifuatazo:", true)
+		fmt.Println("Kuna makosa yafuatayo:")
+		jsOutputReceiverFunction.Invoke("Kuna makosa yafuatayo:", true)
 
 		for _, msg := range p.Errors() {
 			// fmt.Println("\t" + msg)
