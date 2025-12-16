@@ -63,7 +63,7 @@ export default function RootLayout({
             <ThemeToggle />
           </div>
           <SidebarNav />
-          <div className="pl-16">
+          <div className="pl-0 md:pl-16 pb-16 md:pb-0">
             {children}
           </div>
         </ThemeProvider>

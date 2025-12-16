@@ -1,7 +1,5 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { CircuitBoard, Code2 } from "lucide-react";
-import { HighlightedWord } from "@/components/highlighted-word";
 import { AppLogo } from "@/components/app-logo";
 
 export default function Home() {
