@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { AlertCircle, Play, Square, RotateCcw } from "lucide-react";
+import { AlertCircle, Play, Square } from "lucide-react";
 
 type ComponentState = {
 	active: boolean;
@@ -426,8 +426,8 @@ function Buzzer({ active, label }: { active: boolean; label: string }) {
 		// Initialize audio context on first render
 		if (!audioContextRef.current) {
 			try {
-				audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-			} catch (error) {
+				audioContextRef.current = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+			} catch {
 				console.warn("Web Audio API not supported");
 			}
 		}
@@ -480,7 +480,7 @@ function Buzzer({ active, label }: { active: boolean; label: string }) {
 			if (oscillatorRef.current) {
 				try {
 					oscillatorRef.current.stop();
-				} catch (error) {
+				} catch {
 					// Oscillator might already be stopped
 				}
 				oscillatorRef.current = null;
@@ -548,7 +548,7 @@ function Buzzer({ active, label }: { active: boolean; label: string }) {
 function Motor({ active, label }: { active: boolean; label: string }) {
 	// Track rotation position with a ref to avoid re-renders
 	const rotationRef = useRef(0);
-	const [rotationPosition, setRotationPosition] = useState(0);
+	// const [rotationPosition, setRotationPosition] = useState(0);
 	const prevActiveRef = useRef(active);
 
 	// Update rotation immediately when deactivated
@@ -564,7 +564,7 @@ function Motor({ active, label }: { active: boolean; label: string }) {
 					if (match && match[1]) {
 						const currentRotation = parseFloat(match[1]) % 360;
 						rotationRef.current = currentRotation;
-						setRotationPosition(currentRotation);
+						// setRotationPosition(currentRotation);
 					}
 				}
 			}

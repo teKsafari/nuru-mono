@@ -39,7 +39,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 // Icons
-import { Bell, ChevronRight, Home, Menu, MoreHorizontal, Plus, Settings } from "lucide-react";
+import { ChevronRight, Home, Plus } from "lucide-react";
 
 export default function PlaygroundPage() {
   const [progress, setProgress] = React.useState(13);
