@@ -2,7 +2,7 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
-import { CircuitBoard, Code2, Sprout, Github } from "lucide-react";
+import { CircuitBoard, Code2, Sprout, Github} from "lucide-react";
 import Link from "next/link";
 import { AppLogo } from "./app-logo";
 
