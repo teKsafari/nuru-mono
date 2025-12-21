@@ -6,9 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { AlertCircle, Play,  Square, LightbulbIcon, Paintbrush } from "lucide-react";
+import {
+	AlertCircle,
+	Play,
+	Square,
+	LightbulbIcon,
+	Paintbrush,
+} from "lucide-react";
 import {} from "framer-motion";
-
 
 type ComponentState = {
 	active: boolean;
@@ -35,9 +40,6 @@ washa(1)
 subiri(1000)
 zima(1)
 subiri(1000)
-
-
-    
     `;
 
 	const [code, setCode] = useState(exampleCode);
@@ -225,13 +227,13 @@ subiri(1000)
 	return (
 		<div className="grid h-screen max-h-screen grid-cols-1 gap-6 p-4 lg:grid-cols-2">
 			{/* Upande wa Kushoto - Mhariri wa Msimbo na Terminal */}
-			<div className="fit mb-2 flex  flex-col justify-start gap-4 ">
+			<div className="fit mb-2 flex flex-col justify-start gap-4">
 				{/* Mhariri wa Msimbo */}
-				<Card className="flex border-[2px] flex-col  border-accent dark:bg-slate-900">
+				<Card className="flex flex-col border-[2px] border-accent dark:bg-slate-900">
 					<CardContent className="flex h-fit flex-col p-4">
 						<div className="mb-2 flex items-center justify-between">
 							<h3 className="text-lg font-medium">Hariri</h3>
-							
+
 							<div className="flex items-center gap-2">
 								<Button
 									onClick={() => {
@@ -248,35 +250,39 @@ subiri(1000)
 									variant="secondary"
 									className="flex items-center gap-2"
 								>
-									{codeCleared ?  <LightbulbIcon size={16} />:  <Paintbrush size={16} />}
+									{codeCleared ? (
+										<LightbulbIcon size={16} />
+									) : (
+										<Paintbrush size={16} />
+									)}
 								</Button>
-								
-								<Button
-									onClick={ () =>  {
 
-										if(programState == "running"){
+								<Button
+									onClick={() => {
+										if (programState == "running") {
 											stopProgram();
-										resetComponents();	
-										}
-										else if(programState == "idle"){
+											resetComponents();
+										} else if (programState == "idle") {
 											resetComponents();
 											startProgram();
-
 										}
-										
 									}}
 									size="sm"
-									className="flex items-center gap-2 animate-[logo-pulse_1.5s_ease-in-out_infinite]"
-									variant={ programState =="running" ? "destructive" : "default"}
+									className="flex animate-[logo-pulse_1.5s_ease-in-out_infinite] items-center gap-2"
+									variant={
+										programState == "running" ? "destructive" : "default"
+									}
 								>
-									{programState === "running" ?  <Square className="animate-pulse" size={16} /> : <Play size={16} />}
+									{programState === "running" ? (
+										<Square className="animate-pulse" size={16} />
+									) : (
+										<Play size={16} />
+									)}
 								</Button>
-								
 							</div>
 						</div>
 
 						<div className="mb-4 flex items-center justify-between">
-						
 							<div className="flex items-center gap-2">
 								{/* <label
 									className={`flex select-none items-center gap-1 text-xs ${programState === "running" ? "text-slate-400 dark:text-slate-500" : ""}`}
@@ -290,7 +296,6 @@ subiri(1000)
 									/>
 									Rudiarudia (loop)
 								</label> */}
-								
 							</div>
 						</div>
 
@@ -339,8 +344,8 @@ subiri(1000)
 
 						<div
 							ref={outputRef}
-							className="mb-4 flex-1 border-[1px] border-accent overflow-y-auto rounded-lg bg-slate-100 p-3 font-mono text-sm dark:bg-slate-950 dark:text-slate-100"
-						>	
+							className="mb-4 flex-1 overflow-y-auto rounded-lg border-[1px] border-accent bg-slate-100 p-3 font-mono text-sm dark:bg-slate-950 dark:text-slate-100"
+						>
 							{output.length === 0 ? (
 								<div className="italic text-slate-500 dark:text-slate-400">
 									Matokeo yataonekana hapa...
@@ -399,7 +404,7 @@ subiri(1000)
 			<Card className="w-full border-[2px] dark:bg-slate-900">
 				<CardContent className="h-full p-6">
 					<h3 className="mb-4 text-lg font-medium">Vifaa vya ki-Elektroniki</h3>
-		
+
 					<div className="flex items-center justify-center rounded-lg border-[1px] border-accent bg-slate-50 p-8 dark:bg-background">
 						<div className="flex flex-col items-center">
 							<div className="grid grid-cols-1 gap-12">
@@ -423,7 +428,7 @@ subiri(1000)
 			{/* i am only smart enough to know my implementation is 
 			sub-optimal, but too dumb to know better... if you are reading this, 
 			chances are you know your shit, so please help */}
-			<div className="h-20"></div> 
+			<div className="h-20"></div>
 		</div>
 	);
 }
