@@ -1,8 +1,11 @@
 {
-	"name": "app",
+	"name": "nuru-pg-svelte",
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
+	"author": "Nehemiah Kaaya",
+	"email": "heracraft@teksafari.org",
+	"license": "ISC",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
