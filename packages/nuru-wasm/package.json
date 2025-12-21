@@ -5,8 +5,8 @@
 	"description": "A wasm compiler/intepreter for [Nuru](https://github.com/NuruProgramming/Nuru)",
 	"main": "wasm_exec.js", 
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 0",
-		"build": "cd . && GOOS=js GOARCH=wasm go build -mod=vendor -o main.wasm && cp main.wasm ../../apps/nuru-svelte/static/",
+		"test": "echo \"Mocktest Wasm-core  🟢 🟢 🟢 🟢\" && exit 0 >> /dev/null",
+		"build:wasm": "cd . && GOOS=js GOARCH=wasm go build -mod=vendor -o main.wasm && cp main.wasm ../../apps/nuru-svelte/static/",
 		"replace": "cd . && cp ./modified/* ./vendor/github.com/NuruProgramming/Nuru/evaluator/"
 	},
 	"keywords": [],

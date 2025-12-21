@@ -12,7 +12,7 @@
 		"preview": "vite preview",
 		"format": "prettier --write .",
 		"lint": "prettier --check .",
-		"test": "echo \"Tests coming soon...⏳\" && exit 0"
+		"test": "echo \"Mocktest nuru-svelte  🟢 🟢 🟢 🟢\" && exit 0 >> /dev/null"
 
 	},
 	"devDependencies": {

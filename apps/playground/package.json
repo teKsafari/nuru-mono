@@ -1,12 +1,13 @@
 {
-  "name": "nuru-electronic-playground",
+  "name": "nuru-playground",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "echo \"Mocktest Playground  🟢 🟢 🟢 🟢\" && exit 0 >> /dev/null"
   },
   "prettier": {
     "useTabs": true,
