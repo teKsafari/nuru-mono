@@ -1,0 +1,14 @@
+{
+	"name": "nuru-wasm-core",
+	"version": "1.0.0",
+	"description": "A wasm compiler/intepreter for [Nuru](https://github.com/NuruProgramming/Nuru)",
+	"main": "wasm_exec.js", 
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"build:wasm": "cd . && GOOS=js GOARCH=wasm go build -mod=vendor -o main.wasm && cp main.wasm ../app/static/",
+		"replace": "cd . && cp ./modified/* ./vendor/github.com/NuruProgramming/Nuru/evaluator/"
+	},
+	"keywords": [],
+	"author": "Nehemiah Kaaya <heracraft@teksafari.org>",
+	"license": "ISC"
+}
