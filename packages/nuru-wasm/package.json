@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD:packages/nuru-wasm/package.json
 	"name": "@nuru/wasm",
 	"version": "1.0.0",
 	"private": true,
@@ -7,6 +8,15 @@
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 0",
 		"build": "cd . && GOOS=js GOARCH=wasm go build -mod=vendor -o main.wasm && cp main.wasm ../../apps/nuru-svelte/static/",
+=======
+	"name": "nuru-wasm-core",
+	"version": "1.0.0",
+	"description": "A wasm compiler/intepreter for [Nuru](https://github.com/NuruProgramming/Nuru)",
+	"main": "wasm_exec.js", 
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"build:wasm": "cd . && GOOS=js GOARCH=wasm go build -mod=vendor -o main.wasm && cp main.wasm ../app/static/",
+>>>>>>> origin/main:wasm/package.json
 		"replace": "cd . && cp ./modified/* ./vendor/github.com/NuruProgramming/Nuru/evaluator/"
 	},
 	"keywords": [],
