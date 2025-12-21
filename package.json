@@ -1,17 +1,15 @@
 {
-	"name": "nuru-wasm",
-	"version": "1.0.0",
-	"description": "A wasm compiler/intepreter for [Nuru](https://github.com/NuruProgramming/Nuru)",
-	"main": "wasm_exec.js",
+	"name": "nuru-wasm-monorepo",
+	"private": true,
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"dev": "cd app && npm run dev",
-		"build": "cd app && npm run build",
-		"preview": "cd app && npm run preview",
-		"build:wasm": "cd wasm && GOOS=js GOARCH=wasm go build -mod=vendor -o main.wasm && cp main.wasm ../app/static/",
-		"replace": "cd wasm && cp ./modified/* ./vendor/github.com/NuruProgramming/Nuru/evaluator/"
+		"preinstall" : "npx only-allow pnpm",
+		"build": "turbo run build",
+		"dev": "turbo run dev",
+		"lint": "turbo run lint",
+		"format": "turbo run format"
 	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC"
+	"packageManager": "pnpm@9.0.0",
+	"devDependencies": {
+		"turbo": "^2.7.1"
+	}
 }

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [
+        "dist/**",
+        ".next/**",
+        "!.next/cache/**",
+        ".svelte-kit/**",
+        "build/**",
+        "public/build/**",
+        "main.wasm",
+        "main",
+        "static/*.wasm" 
+      ]
+    },
+    "test": {
+      "dependsOn": ["^test"]
+    },
+    "dev": {
+      "persistent": true,
+      "cache": false
+    },
+    "lint": {
+      "outputs": []
+    }
+  }
+}
