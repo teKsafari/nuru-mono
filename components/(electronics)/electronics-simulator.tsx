@@ -388,15 +388,8 @@ subiri(1000)
 			{/* Upande wa Kulia - Vifaa vya Elektroniki */}
 			<Card className="w-full max-w-md border-[2px] dark:bg-slate-900">
 				<CardContent className="h-full p-6">
-					<h3 className="mb-4 text-lg font-medium">Vifaa vya Elektroniki</h3>
-					<div className="mb-2 text-sm text-muted-foreground md:mb-20">
-						<div className="font-medium">Nambari za Vifaa:</div>
-						<div>1: LED Nyekundu</div>
-						<div>2: LED ya Kijani</div>
-						<div>3: LED ya Buluu</div>
-						<div>4: Buzzer</div>
-						<div>5: Motor</div>
-					</div>
+					<h3 className="mb-4 text-lg font-medium">Vifaa vya ki-Elektroniki</h3>
+		
 					<div className="flex items-center justify-center rounded-lg border-[1px] border-accent bg-slate-50 p-8 dark:bg-background">
 						<div className="flex flex-col items-center">
 							<div className="grid grid-cols-1 gap-12">
