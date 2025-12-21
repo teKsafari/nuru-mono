@@ -16,7 +16,6 @@
 
 	},
 	"devDependencies": {
-		"@nuru/core": "workspace:*",
 		"@lucide/svelte": "^0.482.0",
 		"@sveltejs/adapter-vercel": "^5.10.3",
 		"@sveltejs/kit": "^2.43.8",
