@@ -13,11 +13,10 @@
 		"format": "prettier --write .",
 		"lint": "prettier --check .",
 		"test": "echo \"Mocktest nuru-svelte  🟢 🟢 🟢 🟢\" && exit 0 >> /dev/null"
-
 	},
 	"devDependencies": {
 		"@lucide/svelte": "^0.482.0",
-		"@sveltejs/adapter-vercel": "^5.10.3",
+		"@sveltejs/adapter-auto": "^7 .0.0",
 		"@sveltejs/kit": "^2.43.8",
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",
 		"autoprefixer": "^10.4.20",

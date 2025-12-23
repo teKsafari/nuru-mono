@@ -5,6 +5,12 @@ A web interpreter for [Nuru](https://github.com/NuruProgramming/Nuru) -- A Swahi
 **Prerequisites**
 + Go (^1.19.0)
 + Node.js (^18.13)
++ pnpm
+
+```shell
+# Install pnpm if not already installed
+npm install -g pnpm
+```
 
 #### Working with the Wasm Interpreter
 To build the wasm binary from the go interpreter: 
