@@ -79,7 +79,7 @@ cp main.wasm ../../apps/nuru-svelte/static/
 When loaded in a browser environment (requires `wasm_exec.js` from the Go distribution), this module exposes the following global API:
 
 ### `window.runCode(code)`
-executes Nuru source code.
+Executes Nuru source code.
 
 - **Arguments**:
   - `code` (string): The Nuru source code to execute.
