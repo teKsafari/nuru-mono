@@ -11,7 +11,8 @@ Our goal is to make Nuru accessible to everyone, everywhere. By compiling the co
 
 ## 🏗️ Project Structure
 
-This repository is optimized as a monorepo using [Turborepo](https://turbo.build/).
+This repository is optimized as a [monorepo](./MONOREPO.md). 
+> [Read here](./MONOREPO.md) for more information.
 
 ### Packages (`/packages`)
 
@@ -36,7 +37,7 @@ Follow these steps to set up the development environment.
 
 1. **Clone the repository:**
    ```bash
-   git clone <repo-url>
+   git clone https://github.com/teKsafari/nuru-mono.git
    cd nuru-mono
    ```
 
