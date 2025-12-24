@@ -1,4 +1,4 @@
-![alt text](./mawio.jpeg)
+![Nuru Monorepo Banner](./mawio.jpeg)
 
 # Nuru Monorepo
 
