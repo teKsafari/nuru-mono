@@ -1,99 +1,81 @@
-A web interpreter for [Nuru](https://github.com/NuruProgramming/Nuru) -- A Swahili Programming Language built from the ground up -- powered by WebAssembly.  
+![Nuru Monorepo Banner](./mawio.jpeg)
 
-### Getting started
+# Nuru Monorepo
 
-**Prerequisites**
-+ Go (^1.19.0)
-+ Node.js (^18.13)
-+ pnpm
+## 🌍 Mission
 
-```shell
-# Install pnpm if not already installed
-npm install -g pnpm
-```
+Our goal is to make Nuru accessible to everyone, everywhere. By compiling the core Nuru interpreter to WebAssembly (Wasm), we enable:
+- **Interactive Learning**: Run Nuru code directly in your browser.
+- **Zero-Install Setup**: No need to install Go or command-line tools to get started.
+- **Cross-Platform Compatibility**: Use Nuru on any device with a modern web browser.
 
-#### Working with the Wasm Interpreter
-To build the wasm binary from the go interpreter: 
+## 🏗️ Project Structure
 
-1. Change directories to `/wasm`
+This repository is optimized as a monorepo using [Turborepo](https://turbo.build/).
 
-```shell
-cd wasm
-```
+### Packages (`/packages`)
 
-2. Install the required go dependencies
-   
-``` shell
-   go mod tidy
-```
+- **[`@nuru/wasm`](./packages/nuru-wasm)**: The heart of the project. A Go-based WebAssembly interpreter that bridges Nuru's backend logic with the browser's JavaScript environment.
 
-3. Create a go vendor folder
-```shell
-go mod vendor
-```
+### Apps (`/apps`)
 
-and copy the modified `builtins.go` into the evaluator package
+- **[`nuru-svelte`](./apps/nuru-svelte)**: The primary **Nuru Playground**. A fast, reactive web application built with Svelte that lets users write, run, and learn Nuru code interactively.
+- **[`nuru-playground`](./apps/playground)**: An alternative playground implementation using Next.js.
 
-```shell
-cp ./modified/builtins.go ./vendor/github.com/NuruProgramming/Nuru/evaluator/
-```
+## 🚀 Getting Started
 
-or if you are on **Windows**
+Follow these steps to set up the development environment.
 
-```shell
-copy ./modified/builtins.go ./vendor/github.com/NuruProgramming/Nuru/evaluator/
-```
+### Prerequisites
 
-4. To build the wasm binary
+- **Node.js** (^18.13)
+- **pnpm** (Package Manager)
+- **Go** (^1.19.0) - *Required for building the WASM binary*
 
-```shell
-wasm && GOOS=js GOARCH=wasm go build -mod=vendor -o main.wasm
-```
+### Installation
 
-or if you are on **Windows**:
+1. **Clone the repository:**
+   ```bash
+   git clone <repo-url>
+   cd nuru-mono
+   ```
 
-```shell
-$env:GOOS="js"; $env:GOARCH="wasm"; go build -mod=vendor -o main.wasm
-```
+2. **Install dependencies:**
+   ```bash
+   pnpm install
+   ```
 
-> notice the `-mod=vendor` flag in the wasm build. This is to build the project using the vendored dependencies (which now includes the modified builtins).
+### ⚡ Development
 
-#### Web app
-Powered by [Svelte](https://svelte.dev/). To work with it:
+We use `turbo` to manage tasks across the monorepo.
 
-1. Change directories to `/app`
-   
-```shell
-   cd app
-```
+- **Start Development Server** (Runs all apps):
+  ```bash
+  turbo run dev
+  ```
 
-2. Install dependencies
+- **Build All Packages & Apps**:
+  ```bash
+  turbo run build
+  ```
 
-```shell
-npm i
-```
+- **Run Tests**:
+  ```bash
+  turbo run test
+  ```
 
-3. To start a development server:
+> **Tip:** You can filter tasks to specific packages, e.g., `turbo run dev --filter=nuru-svelte`.
 
-```bash
-npm run dev
+## 🤝 Contributing
 
-# or start the server and open the app in a new browser tab
+We welcome contributions! Whether you're fixing bugs in the WASM bridge, enhancing the playground UI, or improving documentation, your help is appreciated.
 
-npm run dev -- --open
-```
+1. Fork the repository.
+2. Create your feature branch (`git checkout -b feature/amazing-feature`).
+3. Commit your changes (`git commit -m 'Add some amazing feature'`).
+4. Push to the branch (`git push origin feature/amazing-feature`).
+5. Open a Pull Request.
 
-#### Workspace scripts
-[/package.json](https://github.com/Heracraft/nuru-playground/blob/main/package.json#L6) redefines the above commands as scripts you can run from the root folder.
+---
 
-```shell
-npm run dev #runs the dev server
-npm run build:wasm #Builds the wasm binary and copies it over to the web app
-npm run replace #Replaces the default Nuru builtins with browser friendly versions
-```
-
-> If you are on windows, edit the [build:wasm](https://github.com/Heracraft/nuru-playground/blob/main/package.json#L11C18-L11C101) & [replace](https://github.com/Heracraft/nuru-playground/blob/main/package.json#L12) scripts to replace `cp` with `copy` or `Copy-Item`
-
-**Coming soon**
-- [x] Support for user inputs (`jaza()`)
-- [ ] Syntax highlighting for Nuru code
+*Powered by [NuruProgramming](https://github.com/NuruProgramming).*
