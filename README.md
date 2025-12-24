@@ -12,7 +12,7 @@ Our goal is to make Nuru accessible to everyone, everywhere. By compiling the co
 ## 🏗️ Project Structure
 
 ## This repository is optimized as a [monorepo](./MONOREPO.md). 
- > [Read here](./MONOREPO.md) for more information.
+> [Read here](./MONOREPO.md) for more information.
 
 ### Packages (`/packages`)
 
