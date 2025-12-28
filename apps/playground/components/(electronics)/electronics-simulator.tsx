@@ -61,7 +61,7 @@ rudia(3) {
 
 	// Auto-scroll output to bottom
 	useEffect(() => {
-		setLoop(true);
+		setLoop(false);
 		if (outputRef.current) {
 			outputRef.current.scrollTop = outputRef.current.scrollHeight;
 		}
