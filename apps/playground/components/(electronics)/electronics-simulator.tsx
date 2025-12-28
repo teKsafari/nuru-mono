@@ -34,12 +34,14 @@ export default function ElectronicsSimulator() {
 
 	// Msimbo wa programu
 
-	const exampleCode = `// Mfano:
+	const exampleCode = `// Mfano: Washa na Zima LED kwa mara 3
 
-washa(1)
-subiri(1000)
-zima(1)
-subiri(1000)
+rudia(3) {
+  washa(1)
+  subiri(500)
+  zima(1)
+  subiri(500)
+}
     `;
 
 	const [code, setCode] = useState(exampleCode);
@@ -135,6 +137,61 @@ subiri(1000)
 			}
 		});
 	};
+
+	// Preprocessor to expand rudia() blocks
+	const preprocessCode = (code: string): string => {
+		const lines = code.split('\n');
+		const expandedLines: string[] = [];
+		let i = 0;
+
+		while (i < lines.length) {
+			const line = lines[i].trim();
+			const rudiaMatch = line.match(/^rudia\((\d+)\)\s*\{$/);
+
+			if (rudiaMatch) {
+				const repeatCount = Number.parseInt(rudiaMatch[1]);
+				// Find the matching closing brace
+				let braceCount = 1;
+				let j = i + 1;
+				const blockLines: string[] = [];
+
+				while (j < lines.length && braceCount > 0) {
+					const currentLine = lines[j].trim();
+					if (currentLine === '{') {
+						braceCount++;
+						blockLines.push(lines[j]);
+					} else if (currentLine === '}') {
+						braceCount--;
+						if (braceCount > 0) {
+							blockLines.push(lines[j]);
+						}
+					} else {
+						blockLines.push(lines[j]);
+					}
+					j++;
+				}
+
+				// Expand the block by repeating it
+				expandedLines.push(`// rudia(${repeatCount}) imeenezwa hapa:`);
+				for (let repeat = 0; repeat < repeatCount; repeat++) {
+					expandedLines.push(`// --- Mzunguko ${repeat + 1}/${repeatCount} ---`);
+					expandedLines.push(...blockLines);
+				}
+				expandedLines.push(`// --- Mwisho wa rudia ---`);
+
+				i = j; // Skip to after the block
+			} else {
+				// Keep the line as is
+				if (lines[i].trim() || i === 0) {
+					expandedLines.push(lines[i]);
+				}
+				i++;
+			}
+		}
+
+		return expandedLines.join('\n');
+	};
+
 	const startProgram = async () => {
 		if (programStateRef.current === "running") return;
 
@@ -144,7 +201,9 @@ subiri(1000)
 		setError(null);
 		addOutput("🚀 Kuanzisha utekelezaji wa programu...");
 
-		const lines = code.split("\n");
+		// Preprocess code to expand rudia() blocks
+		const processedCode = preprocessCode(code);
+		const lines = processedCode.split("\n");
 
 		// Msaidizi wa kutekeleza kila mstari mmoja baada ya mwingine
 		const runLine = async (i: number): Promise<void> => {
