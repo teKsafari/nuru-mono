@@ -365,7 +365,7 @@ rudia(3) {
 									setCode(e.target.value);
 									setCodeCleared(e.target.value === "");
 								}}
-								className="h-[30vh] resize-none bg-slate-50 font-mono text-sm dark:bg-background"
+								className="h-[14rem] md:h-[18rem] resize-none bg-slate-50 font-mono text-sm dark:bg-background"
 								placeholder="Andika programu yako ya elektroniki hapa..."
 								disabled={programState === "running"}
 							/>
