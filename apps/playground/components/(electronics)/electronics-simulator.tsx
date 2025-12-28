@@ -370,16 +370,7 @@ rudia(3) {
 								disabled={programState === "running"}
 							/>
 
-							{/* Angazia mstari wa sasa wa utekelezaji */}
-							{currentLine >= 0 && (
-								<div
-									className="pointer-events-none absolute left-0 right-0 bg-yellow-200 opacity-30"
-									style={{
-										top: `${currentLine * 1.5}rem`,
-										height: "1.5rem",
-									}}
-								/>
-							)}
+							
 						</div>
 
 						{programState === "running" && (
