@@ -16,8 +16,7 @@
 	let editor;
 
 	function setUp() {
-		// runs before the wasm binary is initialized
-		// It's role is to register the output (nuruOutputReceiver) capture function
+		// Registers the output (nuruOutputReceiver) capture function
 		// esentially a bridge from the wasm/go binary. all outputs (errors and prints to the console)
 		// Will be received by the (nuruOutputReceiver) capture function and passed onto the effect function
 
@@ -102,34 +101,17 @@
 		// using fetch
 		const wasmBytes = await loadWasmBinary('/main.wasm');
 
-		setUp();
-
+		
 		WebAssembly.instantiate(wasmBytes.buffer, go.importObject).then((result) => {
 			go.run(result.instance);
 		});
+		
+		setUp();
+		
 
-		// Auto-run code. But is too annoying especially when you have user prompts.
-
-		// $effect(() => {
-		// 	if (code && window.runCode) {
-		// 		setTimeout(() => {
-		// 			runCode(code);
-		// 		}, 1000);
-		// 	}
-		// });
-
-		// Intercepting console.logs from "wasm_exec.js" - don't do this kids
-		// Temp solution removed
-
-		// const log = console.log.bind(console);
-		// console.log = (...args) => {
-		// 	log(...args);
-		// 	output = args.join(' ');
+		// async () => {
+		// 	(await fetch('/main.wasm')).headers.get('Content-Length');
 		// };
-
-		async () => {
-			(await fetch('/main.wasm')).headers.get('Content-Length');
-		};
 	});
 </script>
 
