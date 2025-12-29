@@ -54,7 +54,6 @@ func Read(contents string) {
 }
 
 func runCode(this js.Value, args []js.Value) interface{} {
-	print("Running code")
 	code := args[0].String()
 	Read(code)
 	return nil

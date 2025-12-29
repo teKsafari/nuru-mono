@@ -1,15 +1,6 @@
-./Nuru/*
-./Nuru/
-
-# Ignore binary files
+# Ignore binary files, if any
 main
 main.exe
 
-# Ingore built wasm binary in the wasm directory
-wasm/main.wasm
-
 # Ignore vendor directory
-/wasm/vendor/*
-
-
-../app/nuru-svelte/static 
+vendor/*

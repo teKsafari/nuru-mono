@@ -93,7 +93,3 @@ npm run replace #Replaces the default Nuru builtins with browser friendly versio
 ```
 
 > If you are on windows, edit the [build:wasm](https://github.com/Heracraft/nuru-playground/blob/main/package.json#L11C18-L11C101) & [replace](https://github.com/Heracraft/nuru-playground/blob/main/package.json#L12) scripts to replace `cp` with `copy` or `Copy-Item`
-
-**Coming soon**
-- [x] Support for user inputs (`jaza()`)
-- [ ] Syntax highlighting for Nuru code

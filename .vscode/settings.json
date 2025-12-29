@@ -6,5 +6,8 @@
 
 	"files.associations": {
 		"bun.lock": "jsonc"
+	},
+	"workbench.editor.customLabels.patterns": {
+		"**/src/**/+page.svelte": "${dirname}/${filename}"
 	}
 }
