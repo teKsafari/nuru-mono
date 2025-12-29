@@ -2,34 +2,51 @@
 	import { onMount } from 'svelte';
 	import { MediaQuery } from 'svelte/reactivity';
 
+	import init from '@nuru/wasm';
+
 	import { basicSetup, EditorView } from 'codemirror';
 	import { EditorState } from '@codemirror/state';
 	import { javascript } from '@codemirror/lang-javascript';
-	// import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 	import { oneDark } from '@codemirror/theme-one-dark';
 
 	import * as Resizable from '$lib/components/ui/resizable/index.js';
 	import * as Popover from '$lib/components/ui/popover/index.js';
+	import { Intermediate } from '$lib/components/ui/progress/index.js';
 
-	import Interpreter from '$lib/components/interpreter.svelte';
 	import { Button } from '$lib/components/ui/button';
 
-	import { File, Play, ChevronDown } from 'lucide-svelte';
+	import { fly } from 'svelte/transition';
+
+	import { File, Play, ChevronDown, Info } from 'lucide-svelte';
 
 	import { cn } from '$lib/utils.js';
 
 	import { defaultCode, samplePrograms } from '$lib';
 
+	let nuru = $state();
+
 	let code = $state(defaultCode);
 
 	let isMedium = $state(true);
 
-	let output = $state('<i class="text-muted-foreground">Endesha program. Matokeo yatatokea hapa</i>');
+	let output = $state('');
 
 	let editorWrapper;
 	let editor;
 
-	onMount(() => {
+	function outputEffect(newOutput, isError) {
+		if (isError) {
+			output += `<span class="text-red-400">${newOutput}</span><br/>`;
+		} else {
+			output += newOutput + '<br/>';
+		}
+	}
+
+	onMount(async () => {
+		nuru = await init({
+			outputReceiver: outputEffect
+		});
+
 		isMedium = new MediaQuery('min-width: 640px', true);
 
 		// CodeMirror setup
@@ -108,22 +125,7 @@
 			state: initialState,
 			parent: editorWrapper
 		});
-
-		// editor.dispatch({
-		// 	newDoc
-		// })
 	});
-
-	function outputEffect(newOutput, isError) {
-		if (isError) {
-			newOutput=newOutput.replace("[31m","") // remove formatting done by the interpreter
-			newOutput=newOutput.replace("[0m","") // to give color to the error messages in the terminal. Temporary solution.
-
-			output += `<span class="text-red-400">${newOutput}</span><br/>`;
-		} else {
-			output += newOutput + '<br/>';
-		}
-	}
 </script>
 
 {#snippet fileTab(name, isActive)}
@@ -189,25 +191,33 @@
 				Matokeo
 			</div>
 			<button
+				disabled={!(nuru && nuru.initialized)}
 				onclick={() => {
-					// if the wasm binary has loaded, then the runCode function should be available globally
-					if (window.runCode) {
-						output = '';
-						runCode(code);
-						// console.log("Clicked: running code");
-						// console.log(runCode(code));
-					}
+					nuru.execute(code);
 				}}
 				class="mr-2 rounded p-2 hover:bg-accent"
 			>
 				<Play size={20} class="text-yellow-500" />
 			</button>
 		</div>
-		<!-- <div class="h-full w-full"> -->
-		<Interpreter {code} {outputEffect}>
-			{@html output}
+		<div class="relative h-full w-full px-4 py-2">
+			{#if !(nuru && nuru.initialized)}
+				<div out:fly={{ y: -5 }} class="absolute inset-x-0 top-0 flex flex-col gap-2 bg-accent p-2">
+					<div class="flex items-center gap-2">
+						<Info size={16} />
+						<p>Loading the interpreter</p>
+					</div>
+					<Intermediate class="h-1"></Intermediate>
+				</div>
+			{/if}
+			{#if output != ''}
+				{@html output}
+			{:else}
+				<i class="text-muted-foreground">Endesha program. Matokeo yatatokea hapa</i>
+			{/if}
+		</div>
+		<!-- <Interpreter {code} {outputEffect}>
 		</Interpreter>
-		<!-- <span class="font-semibold">{output}</span> -->
-		<!-- </div> -->
+		 -->
 	</Resizable.Pane>
 </Resizable.PaneGroup>
