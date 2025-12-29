@@ -2,17 +2,17 @@
 
 A high-performance WebAssembly (Wasm) interpreter for [Nuru](https://github.com/NuruProgramming/Nuru) — a Swahili-based programming language. This package enables Nuru code to run directly in the browser, powering the [Nuru Playground](https://github.com/Heracraft/nuru-playground) and other web-based Nuru tools.
 
-## 🚀 Overview
+## Overview
 
 This project compiles the core Go-based Nuru interpreter into WebAssembly, allowing it to interface with JavaScript. It bridges the gap between Nuru's backend logic and frontend applications, providing a seamless execution environment on the web.
 
-## ✨ Features
+## Features
 
 - **In-Browser Execution**: Run Nuru code client-side without a backend server.
 - **JavaScript Interop**: Simple API to send code to the interpreter and receive output.
 - **Custom Builtins**: Modified built-in functions optimized for the browser environment (e.g., handling input/output).
 
-## 🛠️ Prerequisites
+## Prerequisites
 
 To build and develop this package, you need:
 
@@ -25,7 +25,7 @@ To build and develop this package, you need:
 npm install -g pnpm
 ```
 
-## 📦 Installation & Setup
+## Installation & Setup
 
 > **Note:** This project is part of a monorepo managed by [Turborepo](https://turbo.build/). Use `turbo run <process>` from the root directory to execute tasks (e.g., `turbo run build:wasm`, `turbo run test`). This ensures proper caching and dependency management.
 
@@ -64,7 +64,7 @@ npm install -g pnpm
    copy -r ./modified/* ./vendor/github.com/NuruProgramming/Nuru/
    ```
 
-## 🏗️ Building the WASM Binary
+## Building the WASM Binary
 
 To compile the Go code into a `.wasm` binary:
 
@@ -76,7 +76,7 @@ This generates a `main.wasm` file.
 
 > **Note:** The `-mod=vendor` flag is essential to ensure the build uses our modified `builtins.go`.
 
-## 💻 Usage
+## Usage
 
 This package exports a TypeScript wrapper that handles the WASM initialization and execution.
 
