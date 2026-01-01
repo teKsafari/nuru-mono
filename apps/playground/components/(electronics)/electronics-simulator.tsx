@@ -475,10 +475,7 @@ rudia(3) {
 				</CardContent>
 			</Card>
 
-			{/* i am only smart enough to know my implementation is 
-			sub-optimal, but too dumb to know better... if you are reading this, 
-			chances are you know your shit, so please help */}
-			<div className="h-20"></div>
+
 		</div>
 	);
 }

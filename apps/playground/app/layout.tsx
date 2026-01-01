@@ -10,6 +10,7 @@ import './globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { SidebarNav } from '@/components/sidebar-nav'
+import { MobileBreadcrumbNav } from '@/components/mobile-breadcrumb-nav'
 import { JetBrains_Mono } from 'next/font/google'
 
 const jetbrainsMono = JetBrains_Mono({ 
@@ -70,7 +71,8 @@ export default function RootLayout({
             <ThemeToggle />
           </div>
           <SidebarNav />
-          <div className="pl-0 md:pl-16 pb-16 md:pb-0">
+          <MobileBreadcrumbNav />
+          <div className="pl-0 md:pl-16 pt-28 md:pt-0 pb-6 md:pb-0">
             {children}
           </div>
         </ThemeProvider>
