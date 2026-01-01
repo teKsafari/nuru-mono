@@ -11,58 +11,11 @@ interface SiteHeaderProps {
   onMenuClick?: () => void;
 }
 
-interface Tab {
-  label: string;
-  value: string;
-}
 
-interface TabsRowProps {
-  tabs: Tab[];
-  defaultTab?: string;
-}
-
-// Inline TabsRow component - reusable tabs navigation (Mobile only)
-function TabsRow({ tabs, defaultTab }: TabsRowProps) {
-  const [activeTab, setActiveTab] = useState(defaultTab || tabs[0]?.value || "");
-
-  if (tabs.length === 0) return null;
-
-  return (
-    <div className="flex justify-center items-center gap-1 px-4 pb-2 overflow-x-auto scrollbar-none md:hidden">
-      {tabs.map((tab) => (
-        <button
-          key={tab.value}
-          onClick={() => setActiveTab(tab.value)}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
-            activeTab === tab.value
-              ? "bg-accent text-accent-foreground"
-              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-          }`}
-        >
-          {tab.label}
-        </button>
-      ))}
-    </div>
-  );
-}
 
 export function SiteHeader({ onMenuClick }: SiteHeaderProps) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
-
-  // Define tabs for each section (Mobile only)
-  const getTabs = (): Tab[] => {
-    if (pathname === "/anza") {
-      return [
-        { label: "Info", value: "info" },
-        { label: "Code", value: "code" },
-        { label: "Simulation", value: "simulation" },
-      ];
-    }
-    return [];
-  };
-
-  const tabs = getTabs();
 
   const navItems = [
     { label: "Home", href: "/", active: pathname === "/" },
@@ -151,12 +104,6 @@ export function SiteHeader({ onMenuClick }: SiteHeaderProps) {
           </div>
         </div>
 
-        {/* Mobile Tabs Row (Visible only on mobile when applicable) */}
-        {tabs.length > 0 && (
-           <div className="md:hidden border-t border-border/50 pt-2">
-             <TabsRow tabs={tabs} defaultTab="info" />
-           </div>
-        )}
       </header>
     </>
   );

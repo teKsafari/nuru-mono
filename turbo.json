@@ -1,6 +1,6 @@
 {
   "$schema": "https://turborepo.com/schema.json",
-  "ui" : "tui",
+  "ui": "tui",
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -8,16 +8,17 @@
         "dist/**",
         ".next/**",
         "!.next/cache/**",
-        ".svelte-kit/**",
         "build/**",
         "public/build/**",
         "main.wasm",
-        "main",
-        "static/*.wasm" 
+        "main"
       ]
     },
+    "nuru-playground#build": {
+      "dependsOn": ["@nuru/wasm#build"]
+    },
     "test": {
-      "dependsOn": ["^test"], 
+      "dependsOn": ["^test"],
       "cache": false
     },
     "dev": {
