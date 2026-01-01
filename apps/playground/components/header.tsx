@@ -54,9 +54,9 @@ export function SiteHeader({ onMenuClick }: SiteHeaderProps) {
   const getTabs = (): Tab[] => {
     if (pathname === "/play") {
       return [
+        { label: "Info", value: "info" },
         { label: "Code", value: "code" },
-        { label: "Terminal", value: "terminal" },
-        { label: "Simulator", value: "simulator" },
+        { label: "Simulation", value: "simulation" },
       ];
     }
     return [];
@@ -154,7 +154,7 @@ export function SiteHeader({ onMenuClick }: SiteHeaderProps) {
         {/* Mobile Tabs Row (Visible only on mobile when applicable) */}
         {tabs.length > 0 && (
            <div className="md:hidden border-t border-border/50 pt-2">
-             <TabsRow tabs={tabs} defaultTab="code" />
+             <TabsRow tabs={tabs} defaultTab="info" />
            </div>
         )}
       </header>
