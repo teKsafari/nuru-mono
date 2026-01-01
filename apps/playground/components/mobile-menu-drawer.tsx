@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { X, Home, CircuitBoard, Code2, Github, Sprout } from "lucide-react";
+import { X, Home, CircuitBoard, Github, Sprout } from "lucide-react";
 import { AppLogo } from "./app-logo";
 
 interface MobileMenuDrawerProps {
@@ -18,13 +18,8 @@ export function MobileMenuDrawer({ isOpen, onClose }: MobileMenuDrawerProps) {
     { icon: <Home className="w-5 h-5" />, label: "Home", href: "/" },
     {
       icon: <CircuitBoard className="w-5 h-5" />,
-      label: "Electronics Simulator",
-      href: "/electronics",
-    },
-    {
-      icon: <Code2 className="w-5 h-5" />,
-      label: "Software Simulator",
-      href: "/software",
+      label: "Play",
+      href: "/play",
     },
   ];
 

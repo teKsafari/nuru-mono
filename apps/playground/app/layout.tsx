@@ -21,32 +21,14 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: 'nuru playground',
-  description: 'nuru electronics and software playground',
+  description: 'nuru playground',
   generator: 'nuru',
   icons: {
     icon: [
       { url: '/favicon.svg', type: 'image/svg+xml' },
       { url: '/favicon/icon.svg', type: 'image/svg+xml' },
-    ],
-    shortcut: '/favicon.svg',
-    apple: '/favicon.svg',
-    other: {
-      rel: 'mask-icon',
-      url: '/favicon.svg',
-    },
-  },
-  manifest: '/manifest.json',
-  openGraph: {
-    title: 'Nuru Playground',
-    description: 'Nuru electronics and software playground',
-    images: ['/favicon.svg'],
-  },
-  twitter: {
-    card: 'summary',
-    title: 'Nuru Playground',
-    description: 'Nuru electronics and software playground',
-    images: ['/favicon.svg'],
-  },
+    ]
+  }
 }
 
 export default function RootLayout({
