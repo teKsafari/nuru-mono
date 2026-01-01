@@ -1,12 +1,11 @@
 import Link from "next/link";
 import { ArrowRight, Zap } from "lucide-react";
-import { AppLogo } from "@/components/app-logo";
 
 export default function Home() {
 	return (
 		<main className="relative flex items-center justify-center overflow-hidden bg-background font-mono">
 			{/* Hero Content */}
-			<div className="relative flex flex-col justify-center h-svh z-10 mx-auto max-w-4xl px-4 text-center">
+			<div className="relative flex flex-col justify-center min-h-[calc(100svh-4rem)] z-10 mx-auto max-w-4xl px-4 text-center">
 				{/* Main Headline */}
 				<h1 className="font-serif mb-2 text-5xl font-bold text-yellow-500 leading-tight text-foreground md:text-6xl lg:text-7xl">
 					Nuru

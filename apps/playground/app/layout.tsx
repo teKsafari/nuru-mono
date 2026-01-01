@@ -8,8 +8,7 @@ export const viewport: Viewport = {
 
 import './globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
-import { SidebarNav } from '@/components/sidebar-nav'
-import { MobileBreadcrumbNav } from '@/components/mobile-breadcrumb-nav'
+import { SiteHeader } from '@/components/site-header'
 import { JetBrains_Mono } from 'next/font/google'
 
 const jetbrainsMono = JetBrains_Mono({ 
@@ -47,9 +46,8 @@ export default function RootLayout({
       </head>
       <body className={jetbrainsMono.className}>
         <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" enableSystem={false}>
-          <SidebarNav />
-          <MobileBreadcrumbNav />
-          <div>
+          <SiteHeader />
+          <div className="pt-14 md:pt-16">
             {children}
           </div>
         </ThemeProvider>
