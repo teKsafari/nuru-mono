@@ -8,8 +8,8 @@ export const viewport: Viewport = {
 
 import './globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
-import { ThemeToggle } from '@/components/theme-toggle'
 import { SidebarNav } from '@/components/sidebar-nav'
+import { MobileBreadcrumbNav } from '@/components/mobile-breadcrumb-nav'
 import { JetBrains_Mono } from 'next/font/google'
 
 const jetbrainsMono = JetBrains_Mono({ 
@@ -55,22 +55,19 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={jetbrainsMono.variable}>
+    <html lang="en" suppressHydrationWarning className={`dark ${jetbrainsMono.variable}`}>
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="icon" href="/favicon/icon.svg" sizes="any" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/favicon.svg" />
-        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ff9900" />
-        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#00b4d8" />
+        <meta name="theme-color" content="#00b4d8" />
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body className={jetbrainsMono.className}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <div className="fixed top-4 right-4 z-50">
-            <ThemeToggle />
-          </div>
+        <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" enableSystem={false}>
           <SidebarNav />
-          <div className="pl-0 md:pl-16 pb-16 md:pb-0">
+          <MobileBreadcrumbNav />
+          <div className="pl-0 md:pl-16 pt-28 md:pt-0 pb-6 md:pb-0">
             {children}
           </div>
         </ThemeProvider>

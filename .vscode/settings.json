@@ -3,7 +3,6 @@
 		"GOOS": "js",
 		"GOARCH": "wasm"
 	},
-
 	"files.associations": {
 		"bun.lock": "jsonc"
 	},

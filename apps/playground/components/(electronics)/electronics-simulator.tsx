@@ -365,21 +365,12 @@ rudia(3) {
 									setCode(e.target.value);
 									setCodeCleared(e.target.value === "");
 								}}
-								className="h-[30vh] resize-none bg-slate-50 font-mono text-sm dark:bg-background"
+								className="h-[14rem] md:h-[18rem] resize-none bg-slate-50 font-mono text-sm dark:bg-background"
 								placeholder="Andika programu yako ya elektroniki hapa..."
 								disabled={programState === "running"}
 							/>
 
-							{/* Angazia mstari wa sasa wa utekelezaji */}
-							{currentLine >= 0 && (
-								<div
-									className="pointer-events-none absolute left-0 right-0 bg-yellow-200 opacity-30"
-									style={{
-										top: `${currentLine * 1.5}rem`,
-										height: "1.5rem",
-									}}
-								/>
-							)}
+							
 						</div>
 
 						{programState === "running" && (
@@ -462,7 +453,32 @@ rudia(3) {
 			{/* Upande wa Kulia - Vifaa vya Elektroniki */}
 			<Card className="w-full border-[2px] dark:bg-slate-900">
 				<CardContent className="h-full p-6">
-					<h3 className="mb-4 text-lg font-medium">Vifaa vya ki-Elektroniki</h3>
+					<div className="mb-4 flex items-center justify-between">
+						<h3 className="text-lg font-medium">Vifaa vya ki-Elektroniki</h3>
+						
+						<Button
+							onClick={() => {
+								if (programState == "running") {
+									stopProgram();
+									resetComponents();
+								} else if (programState == "idle") {
+									resetComponents();
+									startProgram();
+								}
+							}}
+							size="sm"
+							className="flex animate-[logo-pulse_1.5s_ease-in-out_infinite] items-center gap-2"
+							variant={
+								programState == "running" ? "destructive" : "default"
+							}
+						>
+							{programState === "running" ? (
+								<Square className="animate-pulse" size={16} />
+							) : (
+								<Play size={16} />
+							)}
+						</Button>
+					</div>
 
 					<div className="flex items-center justify-center rounded-lg border-[1px] border-accent bg-slate-50 p-8 dark:bg-background">
 						<div className="flex flex-col items-center">
@@ -484,10 +500,7 @@ rudia(3) {
 				</CardContent>
 			</Card>
 
-			{/* i am only smart enough to know my implementation is 
-			sub-optimal, but too dumb to know better... if you are reading this, 
-			chances are you know your shit, so please help */}
-			<div className="h-20"></div>
+
 		</div>
 	);
 }
