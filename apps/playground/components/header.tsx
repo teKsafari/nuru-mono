@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Menu, Github, Sprout, Home, CircuitBoard } from "lucide-react";
+import { Menu, Github, Sprout } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { MobileMenuDrawer } from "./mobile-menu-drawer";
 import { AppLogo } from "@/components/app-logo";
@@ -74,24 +74,10 @@ export function SiteHeader({ onMenuClick }: SiteHeaderProps) {
       <MobileMenuDrawer isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
       
       {/* Main Header Container */}
-      <header className="fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-md border-b border-border/50 shadow-sm">
+      <header className="sticky top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-md border-b border-border/50 shadow-sm">
         <div className="flex items-center justify-between px-4 h-14 md:px-8">
           
-          {/* Mobile Left: Menu Toggle */}
-          <div className="flex items-center md:hidden">
-            <button
-              onClick={() => {
-                setMenuOpen(true);
-                onMenuClick?.();
-              }}
-              className="p-2 -ml-2 hover:bg-muted rounded-md transition-colors"
-              aria-label="Menu"
-            >
-              <Menu className="w-6 h-6" />
-            </button>
-          </div>
-
-          {/* Logo Section (Centered on Mobile, Left on Desktop) */}
+          {/* Logo Section (Left on Mobile & Desktop) */}
           <div className="flex items-center gap-2 md:order-1">
             <Link href="/" className="flex items-center gap-3 group transition-opacity hover:opacity-90">
               <div className="relative">
@@ -101,8 +87,9 @@ export function SiteHeader({ onMenuClick }: SiteHeaderProps) {
                   className="relative z-10 group-hover:animate-[logo-hover_3s_ease-in-out_infinite]"
                 />
               </div>
+             
               <span className="hidden md:block font-bold text-lg tracking-tight">
-                Nuru Playground
+                Nuru
               </span>
             </Link>
           </div>
@@ -124,10 +111,10 @@ export function SiteHeader({ onMenuClick }: SiteHeaderProps) {
             ))}
           </nav>
 
-          {/* Right Section: External Links & Extras */}
+          {/* Right Section: External Links & Mobile Menu */}
           <div className="flex items-center gap-2 md:order-3">
             {/* Desktop Only External Links */}
-            <div className="hidden md:flex items-center gap-2 pr-2 border-r border-border/50 mr-2">
+            <div className="hidden md:flex items-center gap-2 pr-2 border-l border-border/50 ">
               <a
                 href="https://github.com/NuruProgramming"
                 target="_blank"
@@ -148,7 +135,19 @@ export function SiteHeader({ onMenuClick }: SiteHeaderProps) {
               </a>
             </div>
 
-            {/* Placeholder for future Theme Toggle or User Menu if needed */}
+            {/* Mobile Menu Toggle (Moved to Right) */}
+            <div className="flex items-center md:hidden">
+              <button
+                onClick={() => {
+                  setMenuOpen(true);
+                  onMenuClick?.();
+                }}
+                className="p-2 -mr-2 hover:bg-muted rounded-md transition-colors"
+                aria-label="Menu"
+              >
+                <Menu className="w-6 h-6" />
+              </button>
+            </div>
           </div>
         </div>
 

@@ -7,7 +7,7 @@ export const viewport: Viewport = {
 } 
 
 import './globals.css'
-import { SiteHeader } from '@/components/site-header'
+import { SiteHeader } from '@/components/header'
 import { JetBrains_Mono } from 'next/font/google'
 
 const jetbrainsMono = JetBrains_Mono({ 
@@ -45,7 +45,7 @@ export default function RootLayout({
       </head>
       <body className={jetbrainsMono.className}>
           <SiteHeader />
-          <div className="pt-14 md:pt-16">
+          <div className="">
             {children}
           </div>
       </body>
