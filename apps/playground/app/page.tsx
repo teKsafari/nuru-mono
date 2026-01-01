@@ -10,7 +10,7 @@ export default function Home() {
 					<AppLogo
 						size={48}
 						className="animate-[logo-hover_1.5s_ease-in-out_infinite]"
-					/>
+		 			/>
 					<h1 className="text-5xl font-bold text-foreground">
 						<span className="text-yellow-500">Nuru</span> Playground
 					</h1>
