@@ -1,6 +1,95 @@
 import { LanguageExecutor, LessonContent } from "@/types/playground"
+import init from '@nuru/wasm';
 
+// Singleton to hold the WASM instance and output handler
+let nuruInstance: any = null;
+let currentOutputHandler: ((text: string) => void) | null = null;
 
+// Global output receiver for WASM init
+function globalOutputReceiver(text: string, isError: boolean) {
+  if (currentOutputHandler) {
+    // Basic formatting: newlines are handled by caller or pre-formatted
+    // The previous Svelte code appended <br/>, but our OutputPanel uses <pre>,
+    // so raw newlines are better.
+    // However, if the text comes without newlines, we might need to add them.
+    // The Svelte code: output += newOutput + '<br/>';
+    // Let's assume for now we just pass raw text and append a newline if needed.
+    const formattedText = isError ? `Error: ${text}\n` : `${text}\n`;
+    currentOutputHandler(formattedText);
+  }
+}
+
+async function getNuru() {
+  if (!nuruInstance) {
+    nuruInstance = await init({
+      outputReceiver: globalOutputReceiver
+    });
+  }
+  return nuruInstance;
+}
+
+export const nuruExecutor: LanguageExecutor = {
+  language: "Nuru",
+  run: async (code) => {
+    const nuru = await getNuru();
+    let outputBuffer = "";
+    
+    // Set handler to capture this run's output
+    currentOutputHandler = (text) => {
+      outputBuffer += text;
+    };
+
+    try {
+      await nuru.execute(code);
+    } catch (e) {
+      outputBuffer += `\nExecution Error: ${e}`;
+    } finally {
+      // Cleanup handler
+      currentOutputHandler = null;
+    }
+
+    return outputBuffer;
+  },
+  submit: async (code) => {
+    // For now, submit just runs the code and checks if it runs without error
+    const nuru = await getNuru();
+    let outputBuffer = "";
+     currentOutputHandler = (text) => {
+      outputBuffer += text;
+    };
+    try {
+       await nuru.execute(code);
+       return "✓ Imetebet! (Success)";
+    } catch(e) {
+      return `X Kosa: ${e}`;
+    }
+  },
+  getSolution: () => `chombo = "Tanzania"
+
+andika("Habari " + chombo + "!")`
+}
+
+export const nuruDemo: LessonContent ={
+  title: "Nuru - jifunze programu kwa Kiswahili",
+  initialCode: `chombo = "Tanzania"
+
+andika("Habari " + chombo + "!")
+`,
+description: (
+  //  maelekezo kuhusu nuru kwa lugha ya Kiswahili
+  <div className="space-y-6 text-muted-foreground leading-relaxed">
+    <p>
+      Nuru ni lugha ya programu na mfumo wa kujifunzia ulioundwa mahsusi kwa ajili ya wazungumzaji wa Kiswahili. Lengo letu kuu ni kuwawezesha vijana kujifunza, kuunda, na kujaribu mambo mapya katika lugha wanayoizungumza nyumbani.
+    </p>
+
+    <div className="bg-secondary/50 rounded-lg p-4 mt-6 border border-border">
+      <p className="text-sm text-muted-foreground break-words">
+        <span className="font-semibold text-foreground">Kidokezo:</span> Tumia <code className="px-1 py-0.5 bg-background rounded text-xs font-mono">andika()</code> kuona matokeo.
+      </p>
+    </div>
+  </div>
+)
+}
 
 
 

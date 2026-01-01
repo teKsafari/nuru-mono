@@ -253,6 +253,9 @@ importers:
         specifier: ^3.24.1
         version: 3.25.76
     devDependencies:
+      '@nuru/wasm':
+        specifier: workspace:*
+        version: link:../../packages/wasm
       '@types/node':
         specifier: ^22
         version: 22.19.3
