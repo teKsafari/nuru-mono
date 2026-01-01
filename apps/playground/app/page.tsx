@@ -4,15 +4,12 @@ import { AppLogo } from "@/components/app-logo";
 
 export default function Home() {
 	return (
-		<main className="flex min-h-screen items-center justify-center bg-background p-4 pt-14 font-mono md:p-8">
+		<main className="flex min-h-screen items-center justify-center bg-background p-4 font-mono md:p-8">
 			<div className="mx-auto max-w-4xl text-center">
-				<div className="mb-6 flex items-center justify-center gap-3">
-					<AppLogo
-						size={48}
-						className="animate-[logo-hover_1.5s_ease-in-out_infinite]"
-					/>
+				<div className="mb-4 flex items-center justify-center">
+				
 					<h1 className="text-5xl font-bold text-foreground">
-						<span className="text-yellow-500">Nuru</span> Playground
+						<span className="text-yellow-500">Nuru</span> 
 					</h1>
 				</div>
 				<p className="mx-auto mb-12 max-w-2xl text-xl text-muted-foreground">

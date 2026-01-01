@@ -4,6 +4,9 @@ import React, { useState } from "react";
 import { Menu } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { MobileMenuDrawer } from "./mobile-menu-drawer";
+import { AppLogo } from "@/components/app-logo";
+import Link from "next/link";
+
 
 interface MobileBreadcrumbNavProps {
   onMenuClick?: () => void;
@@ -81,6 +84,13 @@ export function MobileBreadcrumbNav({ onMenuClick }: MobileBreadcrumbNavProps) {
               <Menu className="w-6 h-6" />
             </button>
           </div>
+          {/* clicking this should take us to the home page */} 
+          <Link href="/" className="p-1.5 hover:bg-muted rounded-md transition-colors">
+            <AppLogo
+              size={24}
+              className="animate-[logo-hover_1.5s_ease-in-out_infinite]"
+            />
+          </Link>
         </div>
 
         {/* Tabs Row - using the extracted component */}
