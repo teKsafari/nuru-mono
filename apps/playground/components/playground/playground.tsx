@@ -7,35 +7,42 @@ import { SimulationPanel } from "./simulation-panel"
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/playground/resizable"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { MobileNav } from "./mobile-nav"
+import { PlaygroundProps } from "@/types/playground"
 
-export function Playground() {
+export function Playground({ lesson, executor, simulation }: PlaygroundProps) {
   const isMobile = useIsMobile()
   const [activeTab, setActiveTab] = useState<"lesson" | "code" | "simulation">("lesson")
-  const [code, setCode] = useState(`package main
-
-import "fmt"
-
-func main() {
-    fmt.Println("Hello, World!")
-}`)
+  const [code, setCode] = useState(lesson.initialCode)
   const [output, setOutput] = useState("")
 
-  const handleRun = () => {
-    setOutput("Hello, World!")
+  const handleRun = async () => {
+    setOutput("Running...")
+    try {
+      const result = await executor.run(code)
+      setOutput(result)
+    } catch (error) {
+      setOutput(`Error: ${error}`)
+    }
   }
 
-  const handleSubmit = () => {
-    setOutput("✓ All tests passed!")
+  const handleSubmit = async () => {
+    setOutput("Testing...")
+    try {
+      const result = await executor.submit(code)
+      setOutput(result)
+    } catch (error) {
+      setOutput(`Error: ${error}`)
+    }
   }
 
   const handleShowSolution = () => {
-    setCode(`package main
+    if (executor.getSolution) {
+      setCode(executor.getSolution())
+    }
+  }
 
-import "fmt"
-
-func main() {
-    fmt.Println("The compiled textio server is starting")
-}`)
+  const renderSimulation = () => {
+    return simulation || <SimulationPanel />
   }
 
   if (isMobile) {
@@ -44,7 +51,7 @@ func main() {
         <MobileNav activeTab={activeTab} onTabChange={setActiveTab} />
         <div className="flex-1 overflow-hidden">
           {activeTab === "lesson" ? (
-            <LessonPanel />
+            <LessonPanel lesson={lesson} />
           ) : activeTab === "code" ? (
             <CodePanel
               code={code}
@@ -55,7 +62,7 @@ func main() {
               onShowSolution={handleShowSolution}
             />
           ) : (
-            <SimulationPanel />
+            renderSimulation()
           )}
         </div>
       </div>
@@ -66,7 +73,7 @@ func main() {
     <div className="h-screen bg-background">
       <ResizablePanelGroup direction="horizontal" className="h-full">
         <ResizablePanel defaultSize={35} minSize={20}>
-          <LessonPanel />
+          <LessonPanel lesson={lesson} />
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={40} minSize={25}>
@@ -81,7 +88,7 @@ func main() {
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={25} minSize={15}>
-          <SimulationPanel />
+          {renderSimulation()}
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>
