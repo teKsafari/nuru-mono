@@ -7,9 +7,7 @@ export const viewport: Viewport = {
 } 
 
 import './globals.css'
-import { ThemeProvider } from '@/components/theme-provider'
-import { SidebarNav } from '@/components/sidebar-nav'
-import { MobileBreadcrumbNav } from '@/components/mobile-breadcrumb-nav'
+import { SiteHeader } from '@/components/header'
 import { JetBrains_Mono } from 'next/font/google'
 
 const jetbrainsMono = JetBrains_Mono({ 
@@ -46,13 +44,10 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body className={jetbrainsMono.className}>
-        <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" enableSystem={false}>
-          <SidebarNav />
-          <MobileBreadcrumbNav />
-          <div>
+          <SiteHeader />
+          <div className="">
             {children}
           </div>
-        </ThemeProvider>
       </body>
     </html>
   )

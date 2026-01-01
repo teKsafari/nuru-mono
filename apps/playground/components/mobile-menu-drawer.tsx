@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { X, Home, CircuitBoard, Github, Sprout } from "lucide-react";
+import { X, Home, BookOpenIcon, Github, Sprout } from "lucide-react";
 import { AppLogo } from "./app-logo";
 
 interface MobileMenuDrawerProps {
@@ -17,9 +17,9 @@ export function MobileMenuDrawer({ isOpen, onClose }: MobileMenuDrawerProps) {
   const navItems = [
     { icon: <Home className="w-5 h-5" />, label: "Home", href: "/" },
     {
-      icon: <CircuitBoard className="w-5 h-5" />,
-      label: "Play",
-      href: "/play",
+      icon: <BookOpenIcon className="w-5 h-5" />, 
+      label: "Anza Kujifunza",
+      href: "/anza",
     },
   ];
 
@@ -58,9 +58,9 @@ export function MobileMenuDrawer({ isOpen, onClose }: MobileMenuDrawerProps) {
             <div className="flex items-center gap-3">
               <AppLogo size={32} />
               <div>
-                <h2 className="font-bold text-lg">Nuru Playground</h2>
+                <h2 className="font-bold text-lg">Nuru</h2>
                 <p className="text-xs text-muted-foreground">
-                  Learn & Create
+                  Jifunze, Unda na Vumbua
                 </p>
               </div>
             </div>
