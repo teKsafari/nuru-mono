@@ -67,7 +67,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" enableSystem={false}>
           <SidebarNav />
           <MobileBreadcrumbNav />
-          <div className="pl-0 md:pl-16 pt-28 md:pt-0 pb-6 md:pb-0">
+          <div>
             {children}
           </div>
         </ThemeProvider>
