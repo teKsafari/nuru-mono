@@ -36,7 +36,7 @@ export function MobileMenuDrawer({ isOpen, onClose }: MobileMenuDrawerProps) {
     },
     {
       icon: <Sprout className="w-5 h-5 text-[#00b4d8]" />,
-      label: "teKsafari Garden",
+      label: "teKsafari",
       href: "https://teksafari.org",
     },
   ];
