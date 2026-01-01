@@ -453,7 +453,32 @@ rudia(3) {
 			{/* Upande wa Kulia - Vifaa vya Elektroniki */}
 			<Card className="w-full border-[2px] dark:bg-slate-900">
 				<CardContent className="h-full p-6">
-					<h3 className="mb-4 text-lg font-medium">Vifaa vya ki-Elektroniki</h3>
+					<div className="mb-4 flex items-center justify-between">
+						<h3 className="text-lg font-medium">Vifaa vya ki-Elektroniki</h3>
+						
+						<Button
+							onClick={() => {
+								if (programState == "running") {
+									stopProgram();
+									resetComponents();
+								} else if (programState == "idle") {
+									resetComponents();
+									startProgram();
+								}
+							}}
+							size="sm"
+							className="flex animate-[logo-pulse_1.5s_ease-in-out_infinite] items-center gap-2"
+							variant={
+								programState == "running" ? "destructive" : "default"
+							}
+						>
+							{programState === "running" ? (
+								<Square className="animate-pulse" size={16} />
+							) : (
+								<Play size={16} />
+							)}
+						</Button>
+					</div>
 
 					<div className="flex items-center justify-center rounded-lg border-[1px] border-accent bg-slate-50 p-8 dark:bg-background">
 						<div className="flex flex-col items-center">
