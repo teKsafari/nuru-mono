@@ -1,44 +1,36 @@
 import Link from "next/link";
-import { CircuitBoard, Code2 } from "lucide-react";
+import { ArrowRight, Zap } from "lucide-react";
 import { AppLogo } from "@/components/app-logo";
 
 export default function Home() {
 	return (
-		<main className="flex min-h-screen items-center justify-center bg-background p-4 font-mono md:p-8">
-			<div className="mx-auto max-w-4xl text-center">
-				<div className="mb-4 flex items-center justify-center">
-				
-					<h1 className="text-5xl font-bold text-foreground">
-						<span className="text-yellow-500">Nuru</span> 
-					</h1>
-				</div>
-				<p className="mx-auto mb-12 max-w-2xl text-xl text-muted-foreground">
-					Nuru ni lugha ya programu na mfumo wa kujifunzia ulioundwa mahsusi kwa
-					ajili ya wazungumzaji wa Kiswahili. Lengo letu kuu ni kuwawezesha
-					vijana kujifunza, kuunda, na kujaribu mambo mapya katika lugha
-					wanayoizungumza nyumbani. <br />
-				</p>
+		<main className="relative flex items-center justify-center overflow-hidden bg-background font-mono">
+			{/* Hero Content */}
+			<div className="relative flex flex-col justify-center h-svh z-10 mx-auto max-w-4xl px-4 text-center">
+				{/* Main Headline */}
+				<h1 className="font-serif mb-2 text-5xl font-bold text-yellow-500 leading-tight text-foreground md:text-6xl lg:text-7xl">
+					Nuru
+				</h1>
+				<h2 className="mb-4 text-2xl font-bold leading-tight text-foreground md:text-3xl lg:text-3xl">
+   					Jifunze programming kwa{" "}
+					<span className="text-blue-500">Kiswahili</span>
+				</h2>
 
-				<div className="grid grid-cols-1 gap-6 md:grid-cols-2 max-w-2xl w-full mx-auto">
+		
+				{/* CTA Button */}
+				<div className="flex flex-col items-center gap-4">
 					<Link
 						href="/electronics"
-						className="group relative w-full overflow-hidden border border-border rounded-[24px] md:rounded-[32px] min-h-[200px] md:min-h-[300px] flex flex-col items-center justify-center transition-colors duration-200 hover:border-orange-500 hover:shadow-lg"
-						style={{ "--active-color": "#f97316" } as React.CSSProperties}
+						className="group relative inline-flex items-center gap-3 overflow-hidden rounded-lg border-2 border-yellow-500 bg-yellow-500 px-8 py-4 text-lg font-bold text-black transition-all hover:scale-105"
 					>
-				
-						<div className="relative z-10 flex flex-col items-center justify-center gap-3 md:gap-4 p-4 md:p-6 text-center">
-							<CircuitBoard
-								className="w-10 h-10 md:w-12 md:h-12 text-muted-foreground transition-all duration-300 ease-out group-hover:scale-110 group-hover:text-[var(--active-color)]"
-							/>
-							<div className="space-y-1">
-								<h3 className="text-lg md:text-xl font-bold font-mono group-hover:text-[var(--active-color)] transition-colors">Electronics Playground</h3>
-								<p className="text-sm text-muted-foreground italic">Program Hardware</p>
-							</div>
-						</div>
+						<span>Anza Kujifunza</span>
+						<ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
 					</Link>
-
-					
 				</div>
+
+				
+
+			
 			</div>
 		</main>
 	);
