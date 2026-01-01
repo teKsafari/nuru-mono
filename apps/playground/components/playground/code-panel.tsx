@@ -1,7 +1,5 @@
 "use client"
 
-import { Play, Send, Eye } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { CodeEditor } from "./code-editor"
 import { OutputPanel } from "./output-panel"
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/playground/resizable"
@@ -24,25 +22,14 @@ export function CodePanel({ code, output, onCodeChange, onRun, onSubmit, onShowS
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={30} minSize={15}>
-          <OutputPanel output={output} />
+          <OutputPanel 
+            output={output} 
+            onRun={onRun} 
+            onSubmit={onSubmit} 
+            onShowSolution={onShowSolution} 
+          />
         </ResizablePanel>
       </ResizablePanelGroup>
-
-      {/* Action Buttons */}
-      <div className="flex items-center gap-3 p-4 bg-card border-t border-border">
-        <Button onClick={onSubmit} className="bg-primary hover:bg-primary/90 text-primary-foreground">
-          <Send className="w-4 h-4 mr-2" />
-          Submit
-        </Button>
-        <Button variant="secondary" onClick={onRun}>
-          <Play className="w-4 h-4 mr-2" />
-          Run
-        </Button>
-        <Button variant="outline" onClick={onShowSolution}>
-          <Eye className="w-4 h-4 mr-2" />
-          Solution
-        </Button>
-      </div>
     </div>
   )
 }
