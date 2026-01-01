@@ -7,7 +7,6 @@ export const viewport: Viewport = {
 } 
 
 import './globals.css'
-import { ThemeProvider } from '@/components/theme-provider'
 import { SiteHeader } from '@/components/site-header'
 import { JetBrains_Mono } from 'next/font/google'
 
@@ -45,12 +44,10 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body className={jetbrainsMono.className}>
-        <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" enableSystem={false}>
           <SiteHeader />
           <div className="pt-14 md:pt-16">
             {children}
           </div>
-        </ThemeProvider>
       </body>
     </html>
   )

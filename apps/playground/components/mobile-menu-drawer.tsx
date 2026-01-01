@@ -58,7 +58,7 @@ export function MobileMenuDrawer({ isOpen, onClose }: MobileMenuDrawerProps) {
             <div className="flex items-center gap-3">
               <AppLogo size={32} />
               <div>
-                <h2 className="font-bold text-lg">Nuru Playground</h2>
+                <h2 className="font-bold text-lg">Nuru</h2>
                 <p className="text-xs text-muted-foreground">
                   Learn & Create
                 </p>
