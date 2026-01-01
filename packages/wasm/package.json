@@ -7,7 +7,7 @@
 	"scripts": {
 		"setup": "go mod vendor",
 		"test": "echo \"Mocktest Wasm-core  🟢 🟢 🟢 🟢\" && exit 0 >> /dev/null",
-		"build": "GOOS=js GOARCH=wasm go build -mod=vendor -o main.wasm && tsc",
+		"build:wasm": "GOOS=js GOARCH=wasm go build -mod=vendor -o main.wasm && tsc",
 		"dev": "tsc --watch",
 		"replace": "cp -r ./modified/* ./vendor/github.com/NuruProgramming/Nuru/"
 	},
