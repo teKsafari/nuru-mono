@@ -5,11 +5,11 @@ import { LessonPanel } from "./lesson-panel"
 import { CodePanel } from "./code-panel"
 import { SimulationPanel } from "./simulation-panel"
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/playground/resizable"
-// import { useIsMobile } from "@/hooks/use-mobile"
+import { useIsMobile } from "@/hooks/use-mobile"
 import { MobileNav } from "./mobile-nav"
 
 export function Playground() {
-  const isMobile = true
+  const isMobile = useIsMobile()
   const [activeTab, setActiveTab] = useState<"lesson" | "code" | "simulation">("lesson")
   const [code, setCode] = useState(`package main
 
