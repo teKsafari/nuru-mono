@@ -19,13 +19,13 @@ export default function Home() {
 				{/* CTA Button */}
 				<div className="flex flex-col items-center gap-4">
 					<Link
-						href="/play"
+						href="/anza"
 						className="group relative inline-flex items-center gap-3 overflow-hidden rounded-lg border-2 border-yellow-500 bg-yellow-500 px-8 py-4 text-lg font-bold text-black transition-all hover:scale-105"
 					>
 						<span>Anza Kujifunza</span>
 						<ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-					</Link>
-				</div>
+					</Link> 
+				</div> 
 
 				
 

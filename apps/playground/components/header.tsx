@@ -52,7 +52,7 @@ export function SiteHeader({ onMenuClick }: SiteHeaderProps) {
 
   // Define tabs for each section (Mobile only)
   const getTabs = (): Tab[] => {
-    if (pathname === "/play") {
+    if (pathname === "/anza") {
       return [
         { label: "Info", value: "info" },
         { label: "Code", value: "code" },
@@ -66,7 +66,7 @@ export function SiteHeader({ onMenuClick }: SiteHeaderProps) {
 
   const navItems = [
     { label: "Home", href: "/", active: pathname === "/" },
-    { label: "Play", href: "/play", active: pathname === "/play" },
+    { label: "Anza", href: "/anza", active: pathname === "/anza" },
   ];
 
   return (
