@@ -2,7 +2,7 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
-import { CircuitBoard, Code2, Sprout, Github} from "lucide-react";
+import { CircuitBoard, Sprout, Github} from "lucide-react";
 import Link from "next/link";
 import { AppLogo } from "./app-logo";
 
@@ -12,15 +12,9 @@ export function SidebarNav() {
   const navItems = [
     {
       icon: <CircuitBoard className="w-6 h-6" />,
-      label: "Electronics Simulator",
-      href: "/electronics",
-      active: pathname === "/electronics",
-    },
-    {
-      icon: <Code2 className="w-6 h-6" />,
-      label: "Software Simulator",
-      href: "/software",
-      active: pathname === "/software",
+      label: "Play",
+      href: "/play",
+      active: pathname === "/play",
     },
   ];
 

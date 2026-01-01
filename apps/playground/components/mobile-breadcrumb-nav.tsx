@@ -53,7 +53,7 @@ export function MobileBreadcrumbNav({ onMenuClick }: MobileBreadcrumbNavProps) {
 
   // Define tabs for each section
   const getTabs = (): Tab[] => {
-    if (pathname === "/electronics") {
+    if (pathname === "/play") {
       return [
         { label: "Code", value: "code" },
         { label: "Terminal", value: "terminal" },

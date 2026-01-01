@@ -20,7 +20,7 @@ export default function Home() {
 				{/* CTA Button */}
 				<div className="flex flex-col items-center gap-4">
 					<Link
-						href="/electronics"
+						href="/play"
 						className="group relative inline-flex items-center gap-3 overflow-hidden rounded-lg border-2 border-yellow-500 bg-yellow-500 px-8 py-4 text-lg font-bold text-black transition-all hover:scale-105"
 					>
 						<span>Anza Kujifunza</span>
