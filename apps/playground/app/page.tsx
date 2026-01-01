@@ -37,22 +37,7 @@ export default function Home() {
 						</div>
 					</Link>
 
-					<Link
-						href="/software"
-						className="group relative w-full overflow-hidden border border-border rounded-[24px] md:rounded-[32px] min-h-[200px] md:min-h-[300px] flex flex-col items-center justify-center transition-colors duration-200 hover:border-[#0ea5e9] hover:shadow-lg"
-						style={{ "--active-color": "#0ea5e9" } as React.CSSProperties}
-					>
-				
-						<div className="relative z-10 flex flex-col items-center justify-center gap-3 md:gap-4 p-4 md:p-6 text-center">
-							<Code2
-								className="w-10 h-10 md:w-12 md:h-12 text-muted-foreground transition-all duration-300 ease-out group-hover:scale-110 group-hover:text-[var(--active-color)]"
-							/>
-							<div className="space-y-1">
-								<h3 className="text-lg md:text-xl font-bold font-mono group-hover:text-[var(--active-color)] transition-colors">Software Playground</h3>
-								<p className="text-sm text-muted-foreground italic">Build Software Programs</p>
-							</div>
-						</div>
-					</Link>
+					
 				</div>
 			</div>
 		</main>
