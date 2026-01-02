@@ -1,0 +1,384 @@
+"use client";
+
+import { useRef, useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Play, Square } from "lucide-react";
+
+type ComponentState = {
+	active: boolean;
+	type: "led" | "buzzer" | "motor";
+	color?: string;
+};
+
+type ProgramState = "idle" | "running" | "paused";
+
+interface ElectronicsDisplayComponentProps {
+	components: ComponentState[];
+	programState: ProgramState;
+	startProgram: () => void;
+	stopProgram: () => void;
+	resetComponents: () => void;
+}
+
+export default function ElectronicsDisplayComponent({
+	components,
+	programState,
+	startProgram,
+	stopProgram,
+	resetComponents,
+}: ElectronicsDisplayComponentProps) {
+	return (
+		<Card className="w-full border-[2px] dark:bg-slate-900">
+			<CardContent className="h-full p-6">
+				<div className="mb-4 flex items-center justify-between">
+					<h3 className="text-lg font-medium">Vifaa vya ki-Elektroniki</h3>
+
+					<Button
+						onClick={() => {
+							if (programState == "running") {
+								stopProgram();
+								resetComponents();
+							} else if (programState == "idle") {
+								resetComponents();
+								startProgram();
+							}
+						}}
+						size="sm"
+						className="flex animate-[logo-pulse_1.5s_ease-in-out_infinite] items-center gap-2"
+						variant={programState == "running" ? "destructive" : "default"}
+					>
+						{programState === "running" ? (
+							<Square className="animate-pulse" size={16} />
+						) : (
+							<Play size={16} />
+						)}
+					</Button>
+				</div>
+
+				<div className="flex items-center justify-center rounded-lg border-[1px] border-accent bg-slate-50 p-8 dark:bg-background">
+					<div className="flex flex-col items-center">
+						<div className="grid grid-cols-1 gap-12">
+							{/* LED */}
+							<div className="flex items-center justify-center gap-8">
+								<LED active={components[0].active} color="red" label="1" />
+								<LED active={components[1].active} color="green" label="2" />
+								<LED active={components[2].active} color="blue" label="3" />
+							</div>
+							{/* Buzzer na Motor */}
+							<div className="flex items-center justify-center gap-16">
+								<Buzzer active={components[3].active} label="4" />
+								<Motor active={components[4].active} label="5" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</CardContent>
+		</Card>
+	);
+}
+
+// LED Component
+function LED({
+	active,
+	color,
+	label,
+}: {
+	active: boolean;
+	color: string;
+	label: string;
+}) {
+	const ledColors = {
+		red: {
+			off: "bg-red-200 dark:bg-red-950",
+			on: "bg-red-500 dark:bg-red-600",
+			glow: "shadow-[0_0_10px_#ef4444] dark:shadow-[0_0_15px_#ef4444]",
+		},
+		green: {
+			off: "bg-green-200 dark:bg-green-950",
+			on: "bg-green-500 dark:bg-green-600",
+			glow: "shadow-[0_0_10px_#22c55e] dark:shadow-[0_0_15px_#22c55e]",
+		},
+		blue: {
+			off: "bg-blue-200 dark:bg-blue-950",
+			on: "bg-blue-500 dark:bg-blue-600",
+			glow: "shadow-[0_0_10px_#3b82f6] dark:shadow-[0_0_15px_#3b82f6]",
+		},
+	};
+
+	const colorConfig = ledColors[color as keyof typeof ledColors];
+
+	return (
+		<div className="flex flex-col items-center">
+			<motion.div
+				className={`flex h-12 w-12 items-center justify-center rounded-full ${active ? colorConfig.on : colorConfig.off} ${active ? colorConfig.glow : ""} transition-colors`}
+				initial={{ scale: 1 }}
+				animate={{ scale: active ? [1, 1.05, 1] : 1 }}
+				transition={{ duration: 0.3 }}
+			>
+				<span className="text-xs font-bold text-white opacity-70">{label}</span>
+			</motion.div>
+			<div className="mt-1 text-xs text-slate-600 dark:text-slate-400">
+				{color.toUpperCase()}
+			</div>
+		</div>
+	);
+}
+
+// Buzzer Component with Sound
+function Buzzer({ active, label }: { active: boolean; label: string }) {
+	const audioContextRef = useRef<AudioContext | null>(null);
+	const oscillatorRef = useRef<OscillatorNode | null>(null);
+	const gainNodeRef = useRef<GainNode | null>(null);
+
+	useEffect(() => {
+		// Initialize audio context on first render
+		if (!audioContextRef.current) {
+			try {
+				audioContextRef.current = new (
+					window.AudioContext ||
+					(window as unknown as { webkitAudioContext: typeof AudioContext })
+						.webkitAudioContext
+				)();
+			} catch {
+				console.warn("Web Audio API not supported");
+			}
+		}
+
+		if (active && audioContextRef.current) {
+			// Create and start buzzer sound
+			try {
+				// Resume audio context if it's suspended (required by browser policies)
+				if (audioContextRef.current.state === "suspended") {
+					audioContextRef.current.resume();
+				}
+
+				// Create oscillator for buzzer tone
+				const oscillator = audioContextRef.current.createOscillator();
+				const gainNode = audioContextRef.current.createGain();
+
+				// Set buzzer frequency (800Hz is a typical buzzer frequency)
+				oscillator.frequency.setValueAtTime(
+					1200,
+					audioContextRef.current.currentTime,
+				);
+				oscillator.type = "sine"; // Square wave for buzzer-like sound
+
+				// Set volume (start low to avoid being too loud)
+				gainNode.gain.setValueAtTime(0.1, audioContextRef.current.currentTime);
+
+				// Connect audio nodes
+				oscillator.connect(gainNode);
+				gainNode.connect(audioContextRef.current.destination);
+
+				// Start the sound
+				oscillator.start();
+
+				//  re references for cleanup
+				oscillatorRef.current = oscillator;
+				gainNodeRef.current = gainNode;
+			} catch (error) {
+				console.warn("Could not create buzzer sound:", error);
+			}
+		} else if (!active && oscillatorRef.current) {
+			// Stop the buzzer sound
+			try {
+				oscillatorRef.current.stop();
+				oscillatorRef.current = null;
+				gainNodeRef.current = null;
+			} catch (error) {
+				console.warn("Could not stop buzzer sound:", error);
+			}
+		}
+
+		// Cleanup function
+		return () => {
+			if (oscillatorRef.current) {
+				try {
+					oscillatorRef.current.stop();
+				} catch {
+					// Oscillator might already be stopped
+				}
+				oscillatorRef.current = null;
+				gainNodeRef.current = null;
+			}
+		};
+	}, [active]);
+
+	return (
+		<div className="flex flex-col items-center">
+			<motion.div
+				className={`h-20 w-20 rounded-full border-4 bg-slate-800 dark:bg-slate-900 ${active ? "border-yellow-400" : "border-slate-600 dark:border-slate-700"} relative flex items-center justify-center`}
+				animate={active ? { rotate: [0, 5, -5, 0] } : {}}
+				transition={{
+					repeat: active ? Number.POSITIVE_INFINITY : 0,
+					duration: 0.2,
+				}}
+			>
+				<span className="absolute top-1 text-xs font-bold text-white opacity-70">
+					{label}
+				</span>
+				<div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-700 dark:bg-slate-800">
+					<div
+						className={`h-6 w-6 rounded-full ${active ? "bg-yellow-400" : "bg-slate-600 dark:bg-slate-700"}`}
+					></div>
+				</div>
+
+				{active && (
+					<>
+						<motion.div
+							className="absolute -inset-1 rounded-full border-2 border-yellow-400 opacity-70"
+							initial={{ scale: 1, opacity: 0.7 }}
+							animate={{ scale: 1.2, opacity: 0 }}
+							transition={{
+								repeat: Number.POSITIVE_INFINITY,
+								duration: 0.8,
+								ease: "easeOut",
+							}}
+						/>
+						<motion.div
+							className="absolute -inset-3 rounded-full border-2 border-yellow-300 opacity-50"
+							initial={{ scale: 1, opacity: 0.5 }}
+							animate={{ scale: 1.4, opacity: 0 }}
+							transition={{
+								repeat: Number.POSITIVE_INFINITY,
+								duration: 1,
+								ease: "easeOut",
+							}}
+						/>
+						<motion.div
+							className="absolute -inset-5 rounded-full border-2 border-yellow-200 opacity-30"
+							initial={{ scale: 1, opacity: 0.3 }}
+							animate={{ scale: 1.6, opacity: 0 }}
+							transition={{
+								repeat: Number.POSITIVE_INFINITY,
+								duration: 1.2,
+								ease: "easeOut",
+							}}
+						/>
+					</>
+				)}
+			</motion.div>
+			<div className="mt-1 text-xs text-slate-600 dark:text-slate-400">
+				BUZZER
+			</div>
+		</div>
+	);
+}
+
+// Motor Component
+function Motor({ active, label }: { active: boolean; label: string }) {
+	// Track rotation position with a ref to avoid re-renders
+	const rotationRef = useRef(0);
+	// const [rotationPosition, setRotationPosition] = useState(0);
+	const prevActiveRef = useRef(active);
+
+	// Update rotation immediately when deactivated
+	useEffect(() => {
+		// Handle motor stopping
+		if (prevActiveRef.current && !active) {
+			// Capture the exact rotation at stop time
+			const element = document.querySelector(
+				`[data-motor-id="${label}"]`,
+			) as HTMLElement;
+			if (element) {
+				const transform = element.style.transform;
+				if (transform) {
+					const match = transform.match(/rotate\(([^)]+)deg\)/);
+					if (match && match[1]) {
+						const currentRotation = parseFloat(match[1]) % 360;
+						rotationRef.current = currentRotation;
+						// setRotationPosition(currentRotation);
+					}
+				}
+			}
+		}
+
+		prevActiveRef.current = active;
+	}, [active, label]);
+
+	return (
+		<div className="flex flex-col items-center">
+			<motion.div className="relative">
+				<span className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold text-slate-500 dark:text-slate-400">
+					{label}
+				</span>
+
+				{/* Motor Base */}
+				<div
+					className={`relative flex h-16 w-24 items-center justify-center rounded-lg bg-slate-700 dark:bg-slate-800 ${active ? "ring-2 ring-blue-400 ring-opacity-70" : ""}`}
+				>
+					<div className="absolute inset-0 flex items-center justify-center">
+						<div className="z-10 flex h-10 w-10 items-center justify-center rounded-full bg-slate-800 dark:bg-slate-900">
+							<div className="h-2 w-2 rounded-full bg-slate-600 dark:bg-slate-700"></div>
+						</div>
+					</div>
+
+					{/* Motor Shaft with enhanced spinning */}
+					<motion.div
+						className="absolute h-16 w-16"
+						data-motor-id={label}
+						initial={{ rotate: rotationRef.current }}
+						animate={{
+							rotate: active
+								? [rotationRef.current, rotationRef.current + 360]
+								: rotationRef.current,
+							scale: active ? [1, 1.03, 1] : 1,
+						}}
+						transition={{
+							rotate: {
+								repeat: active ? Number.POSITIVE_INFINITY : 0,
+								duration: active ? 0.5 : 0,
+								ease: "linear",
+							},
+							scale: {
+								repeat: Number.POSITIVE_INFINITY,
+								duration: 0.3,
+							},
+						}}
+					>
+						<div className="absolute left-1/2 top-1/2 h-8 w-1 -translate-x-1/2 -translate-y-1/2 bg-slate-400 dark:bg-slate-300"></div>
+						<div className="absolute left-1/2 top-1/2 h-1 w-8 -translate-x-1/2 -translate-y-1/2 bg-slate-400 dark:bg-slate-300"></div>
+
+						{/* Circular sector marker to visualize rotation */}
+						<div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+							<div className="relative h-10 w-10">
+								{/* Sector marker */}
+								<div
+									className="absolute h-4 w-4 rounded-sm bg-yellow-300"
+									style={{ top: "0px", left: "3px" }}
+								></div>
+							</div>
+						</div>
+					</motion.div>
+
+					{/* Visual spinning indicator */}
+					{active && (
+						<motion.div
+							className="absolute inset-0 rounded-lg border-2 border-blue-400 opacity-60"
+							initial={{ scale: 1, opacity: 0.6 }}
+							animate={{ scale: 1.1, opacity: 0 }}
+							transition={{
+								repeat: Number.POSITIVE_INFINITY,
+								duration: 0.8,
+								ease: "easeOut",
+							}}
+						/>
+					)}
+				</div>
+
+				{/* Motor Terminals */}
+				<div
+					className={`absolute -bottom-2 left-0 h-4 w-4 ${active ? "bg-red-600" : "bg-red-500 dark:bg-red-700"} rounded-full border-2 border-slate-700 dark:border-slate-800`}
+				></div>
+				<div
+					className={`absolute -bottom-2 right-0 h-4 w-4 ${active ? "bg-blue-600" : "bg-blue-500 dark:bg-blue-700"} rounded-full border-2 border-slate-700 dark:border-slate-800`}
+				></div>
+			</motion.div>
+			<div className="mt-1 text-xs text-slate-600 dark:text-slate-400">
+				MOTOR
+			</div>
+		</div>
+	);
+}
