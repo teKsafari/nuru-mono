@@ -45,12 +45,6 @@ npm install -g pnpm
   pnpm run setup
   ```
 
-  or you can run
-
-   ```bash
-   go mod vendor
-   ```
-
 4. **Apply Custom Modifications:**
    Copy the browser-optimized `builtins.go` into the vendored Nuru evaluator package.
 

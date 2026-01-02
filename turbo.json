@@ -8,12 +8,10 @@
         "dist/**",
         ".next/**",
         "!.next/cache/**",
-        ".svelte-kit/**",
         "build/**",
         "public/build/**",
         "main.wasm",
-        "main",
-        "static/*.wasm"
+        "main"
       ]
     },
     "nuru-playground#build": {
