@@ -1,119 +1,162 @@
-# Electronics Simulator Component Refactoring
+# Electronics Simulator Component Architecture
 
 ## Overview
 
-The electronics simulator has been refactored into modular, reusable components that can be called with necessary props.
+The electronics simulator has been refactored into modular, reusable components with a decoupled execution engine that can be reused anywhere in the program.
 
-## New Component Structure
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    ElectronicsSimulator                      │
+│                    (UI Container)                            │
+└─────────────────┬───────────────────────────────────────────┘
+                  │
+                  │ uses
+                  ▼
+┌─────────────────────────────────────────────────────────────┐
+│                  ElectronicsExecutor                         │
+│                  (Execution Engine)                          │
+│  - preprocessCode()   - executeCommand()                     │
+│  - startProgram()     - stopProgram()                        │
+│  - resetAllComponents()                                      │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## Core Files
+
+### 1. **ElectronicsExecutor** (`lib/electronicsExecutor.ts`)
+
+The decoupled execution engine that handles all command execution logic. Can be imported and used anywhere.
+
+**Key Features:**
+
+- Command parsing (washa, zima, subiri)
+- rudia() block preprocessing (loop expansion)
+- Program execution control
+- Callback-based communication with UI
+
+**Usage:**
+
+```typescript
+import {
+	ElectronicsExecutor,
+	createElectronicsExecutor,
+} from "@/lib/electronicsExecutor";
+
+const executor = new ElectronicsExecutor(
+	{
+		onComponentChange: (index, active) => {
+			/* update component */
+		},
+		onOutput: (message, type) => {
+			/* add to terminal */
+		},
+		onLineChange: (line) => {
+			/* highlight line */
+		},
+		onStateChange: (state) => {
+			/* update program state */
+		},
+		onError: (error) => {
+			/* show error */
+		},
+	},
+	{
+		componentCount: 5,
+		loop: false,
+	},
+);
+
+// Execute a program
+await executor.startProgram(code);
+
+// Execute a single command
+await executor.executeCommand("washa(1)");
+
+// Stop execution
+executor.stopProgram();
+
+// Reset all components
+executor.resetAllComponents();
+```
+
+### 2. **Types** (`types/electronics.ts`)
+
+Shared types for the electronics system.
+
+```typescript
+export type ComponentState = {
+	active: boolean;
+	type: "led" | "buzzer" | "motor";
+	color?: string;
+};
+
+export type ProgramState = "idle" | "running" | "paused";
+
+export type OutputType = "info" | "error" | "success";
+
+export interface ExecutorCallbacks {
+	onComponentChange: (index: number, active: boolean) => void;
+	onOutput: (message: string, type: OutputType) => void;
+	onLineChange: (line: number) => void;
+	onStateChange: (state: ProgramState) => void;
+	onError: (error: string | null) => void;
+}
+
+export interface ExecutorConfig {
+	componentCount: number;
+	loop?: boolean;
+}
+```
+
+## UI Components
 
 ### 1. **TerminalComponent** (`terminal-component.tsx`)
 
-Handles all terminal-related functionality including output display, error messages, and direct command execution.
-
-**Props:**
-
-- `output: string[]` - Array of terminal output lines
-- `error: string | null` - Current error message
-- `programState: ProgramState` - Current state of the program
-- `command: string` - Current command input
-- `setCommand: (cmd: string) => void` - Command setter
-- `executeDirectCommand: () => void` - Execute command handler
-- `clearOutput: () => void` - Clear terminal output
-
-**Usage:**
-
-```tsx
-<TerminalComponent
-	output={output}
-	error={error}
-	programState={programState}
-	command={command}
-	setCommand={setCommand}
-	executeDirectCommand={executeDirectCommand}
-	clearOutput={clearOutput}
-/>
-```
+Terminal display & command input
 
 ### 2. **CodeEditorComponent** (`code-editor-component.tsx`)
 
-Handles code editing and program execution controls.
-
-**Props:**
-
-- `code: string` - Current code content
-- `setCode: (code: string) => void` - Code setter
-- `programState: ProgramState` - Current state of the program
-- `currentLine: number` - Current executing line
-- `exampleCode: string` - Example code template
-- `codeCleared: boolean` - Whether code has been cleared
-- `setCodeCleared: (cleared: boolean) => void` - Code cleared state setter
-- `startProgram: () => void` - Start program handler
-- `stopProgram: () => void` - Stop program handler
-- `resetComponents: () => void` - Reset components handler
-
-**Usage:**
-
-```tsx
-<CodeEditorComponent
-	code={code}
-	setCode={setCode}
-	programState={programState}
-	currentLine={currentLine}
-	exampleCode={exampleCode}
-	codeCleared={codeCleared}
-	setCodeCleared={setCodeCleared}
-	startProgram={startProgram}
-	stopProgram={stopProgram}
-	resetComponents={resetComponents}
-/>
-```
+Code editor & execution controls
 
 ### 3. **ElectronicsDisplayComponent** (`electronics-display-component.tsx`)
 
-Displays all electronic components (LEDs, Buzzer, Motor) with their animations and states.
+LED, Buzzer, Motor display
 
-**Props:**
+### 4. **ElectronicsSimulator** (`electronics-simulator.tsx`)
 
-- `components: ComponentState[]` - Array of component states
-- `programState: ProgramState` - Current state of the program
-- `startProgram: () => void` - Start program handler
-- `stopProgram: () => void` - Stop program handler
-- `resetComponents: () => void` - Reset components handler
-
-**Usage:**
-
-```tsx
-<ElectronicsDisplayComponent
-	components={components}
-	programState={programState}
-	startProgram={startProgram}
-	stopProgram={stopProgram}
-	resetComponents={resetComponents}
-/>
-```
-
-## Main Component
-
-The main `ElectronicsSimulator` component now acts as a container that:
-
-1. Manages all state (components, code, output, etc.)
-2. Contains all business logic (command execution, preprocessor, etc.)
-3. Delegates rendering to the three separate components
-
-## Benefits
-
-1. **Modularity**: Each component has a clear, single responsibility
-2. **Reusability**: Components can be used independently in different contexts (e.g., lessons)
-3. **Maintainability**: Easier to locate and fix bugs in specific functionality
-4. **Testability**: Each component can be tested in isolation
-5. **Flexibility**: Easy to swap out or modify individual components without affecting others
+Main container that wires up executor with UI components
 
 ## File Structure
 
 ```
-components/(electronics)/
-  ├── electronics-simulator.tsx       # Main container component
-  ├── terminal-component.tsx         # Terminal display & command input
-  ├── code-editor-component.tsx      # Code editor & execution controls
-  └── electronics-display-component.tsx  # LED, Buzzer, Motor display
+apps/playground/
+├── components/(electronics)/
+│   ├── electronics-simulator.tsx     # Main container
+│   ├── terminal-component.tsx        # Terminal UI
+│   ├── code-editor-component.tsx     # Code editor UI
+│   ├── electronics-display-component.tsx  # Components display
+│   └── README.md
+├── lib/
+│   └── electronicsExecutor.ts        # Execution engine (reusable!)
+└── types/
+    └── electronics.ts                # Shared types
 ```
+
+## Benefits
+
+1. **Decoupled Logic**: Execution logic is separate from UI, can be reused in lessons, tests, etc.
+2. **Testability**: ElectronicsExecutor can be unit tested in isolation
+3. **Flexibility**: Use executor in different UI contexts (simulator, lessons, embedded)
+4. **Maintainability**: Changes to execution logic don't affect UI components
+5. **Type Safety**: Shared types ensure consistency across the codebase
+
+## Commands Supported
+
+| Command            | Description              | Example                 |
+| ------------------ | ------------------------ | ----------------------- |
+| `washa(n)`         | Turn on component n      | `washa(1)`              |
+| `zima(n)`          | Turn off component n     | `zima(2)`               |
+| `subiri(ms)`       | Wait for ms milliseconds | `subiri(500)`           |
+| `rudia(n) { ... }` | Repeat block n times     | `rudia(3) { washa(1) }` |

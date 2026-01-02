@@ -67,6 +67,8 @@ export async function executeNuru(code: string): Promise<string> {
 	return outputBuffer;
 }
 
+
+
 /**
  * Set a custom output handler for advanced use cases
  * (e.g., streaming output to a terminal)
@@ -76,3 +78,5 @@ export function setOutputHandler(
 ): void {
 	currentOutputHandler = handler;
 }
+
+
