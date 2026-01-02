@@ -76,3 +76,5 @@ export function setOutputHandler(
 ): void {
 	currentOutputHandler = handler;
 }
+
+
