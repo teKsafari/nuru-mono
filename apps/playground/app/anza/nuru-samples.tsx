@@ -1,65 +1,15 @@
 import { LanguageExecutor, LessonContent } from "@/types/playground";
-import init from "@nuru/wasm";
-
-// Singleton to hold the WASM instance and output handler
-let nuruInstance: any = null;
-let currentOutputHandler: ((text: string) => void) | null = null;
-
-// Global output receiver for WASM init
-function globalOutputReceiver(text: string, isError: boolean) {
-	if (currentOutputHandler) {
-		// Basic formatting: newlines are handled by caller or pre-formatted
-		// The previous Svelte code appended <br/>, but our OutputPanel uses <pre>,
-		// so raw newlines are better.
-		// However, if the text comes without newlines, we might need to add them.
-		// The Svelte code: output += newOutput + '<br/>';
-		// Let's assume for now we just pass raw text and append a newline if needed.
-		const formattedText = isError ? `Error: ${text}\n` : `${text}\n`;
-		currentOutputHandler(formattedText);
-	}
-}
-
-async function getNuru() {
-	if (!nuruInstance) {
-		nuruInstance = await init({
-			outputReceiver: globalOutputReceiver,
-		});
-	}
-	return nuruInstance;
-}
+import { executeNuru } from "@/lib/nuru";
 
 export const nuruExecutor: LanguageExecutor = {
 	language: "Nuru",
 	run: async (code) => {
-		const nuru = await getNuru();
-		let outputBuffer = "";
-
-		// Set handler to capture this run's output
-		currentOutputHandler = (text) => {
-			outputBuffer += text;
-		};
-
-		try {
-			await nuru.execute(code);
-		} catch (e) {
-			outputBuffer += `\nExecution Error: ${e}`;
-		} finally {
-			// Cleanup handler
-			currentOutputHandler = null;
-		}
-
-		return outputBuffer;
+		return await executeNuru(code);
 	},
 	submit: async (code) => {
-		// For now, submit just runs the code and checks if it runs without error
-		const nuru = await getNuru();
-		let outputBuffer = "";
-		currentOutputHandler = (text) => {
-			outputBuffer += text;
-		};
 		try {
-			await nuru.execute(code);
-			return "✓ Imetebet! (Success)";
+			await executeNuru(code);
+			return "✓ Submitted!";
 		} catch (e) {
 			return `X Kosa: ${e}`;
 		}
