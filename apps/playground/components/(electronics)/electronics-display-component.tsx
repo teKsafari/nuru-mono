@@ -6,13 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Play, Square } from "lucide-react";
 
-type ComponentState = {
-	active: boolean;
-	type: "led" | "buzzer" | "motor";
-	color?: string;
-};
-
-type ProgramState = "idle" | "running" | "paused";
+import type { ComponentState, ProgramState } from "@/types/electronics";
 
 interface ElectronicsDisplayComponentProps {
 	components: ComponentState[];
@@ -62,14 +56,14 @@ export default function ElectronicsDisplayComponent({
 						<div className="grid grid-cols-1 gap-12">
 							{/* LED */}
 							<div className="flex items-center justify-center gap-8">
-								<LED active={components[0].active} color="red" label="1" />
-								<LED active={components[1].active} color="green" label="2" />
-								<LED active={components[2].active} color="blue" label="3" />
+								<LED active={components[0].isEnabled} color="red" label="1" />
+								<LED active={components[1].isEnabled} color="green" label="2" />
+								<LED active={components[2].isEnabled} color="blue" label="3" />
 							</div>
 							{/* Buzzer na Motor */}
 							<div className="flex items-center justify-center gap-16">
-								<Buzzer active={components[3].active} label="4" />
-								<Motor active={components[4].active} label="5" />
+								<Buzzer active={components[3].isEnabled} label="4" />
+								<Motor active={components[4].isEnabled} label="5" />
 							</div>
 						</div>
 					</div>

@@ -3,6 +3,7 @@ import type {
 	ExecutorConfig,
 	ProgramState,
 	OutputType,
+	ComponentState,
 } from "@/types/electronics";
 
 /**
@@ -18,6 +19,7 @@ export class ElectronicsExecutor {
 	private programState: ProgramState = "idle";
 	private executionTimeout: NodeJS.Timeout | null = null;
 	private currentLine: number = -1;
+	private outputBuffer: string[] = [];
 
 	constructor(callbacks: ExecutorCallbacks, config: ExecutorConfig) {
 		this.callbacks = callbacks;
@@ -39,12 +41,19 @@ export class ElectronicsExecutor {
 	}
 
 	/**
-	 * Add output message with timestamp
+	 * Add output message (optionally with timestamp)
 	 */
-	private addOutput(message: string, type: OutputType = "info") {
-		const timestamp = new Date().toLocaleTimeString();
+	private addOutput(
+		message: string,
+		type: OutputType = "info",
+		includeTimestamp = true,
+	) {
 		const prefix = type === "error" ? "❌" : type === "success" ? "✅" : "ℹ️";
-		this.callbacks.onOutput(`[${timestamp}] ${prefix} ${message}`, type);
+		const formattedMessage = includeTimestamp
+			? `[${new Date().toLocaleTimeString()}] ${prefix} ${message}`
+			: `${prefix} ${message}`;
+		this.outputBuffer.push(formattedMessage);
+		this.callbacks.onOutput(formattedMessage, type);
 	}
 
 	/**
@@ -169,6 +178,31 @@ export class ElectronicsExecutor {
 		}
 
 		return expandedLines.join("\n");
+	}
+
+	/**
+	 * Run program and return output as string (for playground integration)
+	 */
+	async run(code: string): Promise<string> {
+		this.outputBuffer = [];
+
+		return new Promise((resolve) => {
+			const originalOnOutput = this.callbacks.onOutput;
+			const originalOnStateChange = this.callbacks.onStateChange;
+
+			// Override to capture completion
+			this.callbacks.onStateChange = (state) => {
+				originalOnStateChange(state);
+				if (state === "idle" && this.programState === "idle") {
+					// Restore original callbacks
+					this.callbacks.onOutput = originalOnOutput;
+					this.callbacks.onStateChange = originalOnStateChange;
+					resolve(this.outputBuffer.join("\n"));
+				}
+			};
+
+			this.startProgram(code);
+		});
 	}
 
 	/**
@@ -311,14 +345,14 @@ export function createElectronicsExecutor(
 }
 
 /**
- * Default component configuration
+ * Default component configuration - extends Gpio
  */
-export const DEFAULT_COMPONENTS = [
-	{ active: false, type: "led" as const, color: "red" },
-	{ active: false, type: "led" as const, color: "green" },
-	{ active: false, type: "led" as const, color: "blue" },
-	{ active: false, type: "buzzer" as const },
-	{ active: false, type: "motor" as const },
+export const DEFAULT_COMPONENTS: ComponentState[] = [
+	{ pin: 1, isEnabled: false, isInput: false, type: "led", color: "red" },
+	{ pin: 2, isEnabled: false, isInput: false, type: "led", color: "green" },
+	{ pin: 3, isEnabled: false, isInput: false, type: "led", color: "blue" },
+	{ pin: 4, isEnabled: false, isInput: false, type: "buzzer" },
+	{ pin: 5, isEnabled: false, isInput: false, type: "motor" },
 ];
 
 /**

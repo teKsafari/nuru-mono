@@ -29,9 +29,11 @@ export default function ElectronicsSimulator() {
 	useEffect(() => {
 		executorRef.current = new ElectronicsExecutor(
 			{
-				onComponentChange: (index, active) => {
+				onComponentChange: (index, isEnabled) => {
 					setComponents((prev) =>
-						prev.map((comp, i) => (i === index ? { ...comp, active } : comp)),
+						prev.map((comp, i) =>
+							i === index ? { ...comp, isEnabled } : comp,
+						),
 					);
 				},
 				onOutput: (message) => {

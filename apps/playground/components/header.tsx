@@ -20,6 +20,7 @@ export function SiteHeader({ onMenuClick }: SiteHeaderProps) {
   const navItems = [
     { label: "Home", href: "/", active: pathname === "/" },
     { label: "Anza", href: "/anza", active: pathname === "/anza" },
+    { label: "Elektroniki", href: "/integrated-electronics", active: pathname === "/integrated-electronics" },
   ];
 
   return (
