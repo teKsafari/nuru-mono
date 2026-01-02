@@ -11,6 +11,7 @@ export interface LessonContent {
   title: string
   description: React.ReactNode
   initialCode: string
+  simulation?: React.ReactNode
 }
 
 export interface PlaygroundProps {
