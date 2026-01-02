@@ -41,10 +41,6 @@ export function Playground({ lesson, executor, simulation }: PlaygroundProps) {
     }
   }
 
-  const renderSimulation = () => {
-    return simulation || <SimulationPanel />
-  }
-
   if (isMobile) {
     return (
       <div className="flex flex-col h-screen bg-background">
@@ -62,7 +58,13 @@ export function Playground({ lesson, executor, simulation }: PlaygroundProps) {
               onShowSolution={handleShowSolution}
             />
           ) : (
-            renderSimulation()
+            simulation ? (
+              <SimulationPanel nodes={[]} edges={[]} content={simulation} />
+            ) : (
+              <div className="flex items-center justify-center h-full w-full">
+                <p className="text-green-500">No simulation available</p>
+              </div>
+            )
           )}
         </div>
       </div>
@@ -88,7 +90,7 @@ export function Playground({ lesson, executor, simulation }: PlaygroundProps) {
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={25} minSize={15}>
-          {renderSimulation()}
+          <SimulationPanel nodes={[]} edges={[]} content={simulation} />
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>
