@@ -17,6 +17,7 @@ export function LessonPanel({ lesson }: LessonPanelProps) {
 
         {lesson.description}
       </div>
+  
     </ScrollArea>
   )
 }
