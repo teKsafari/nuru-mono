@@ -162,24 +162,9 @@ export function LessonsDrawer() {
 						</div>
 					</div>
 					<DrawerFooter>
-						<div className="flex w-full justify-center gap-6">
-							<a
-								className="text-xs text-muted-foreground underline hover:text-foreground"
-								href="https://github.com/teksafari/nuru"
-								target="_blank"
-								rel="noreferrer"
-							>
-								GitHub
-							</a>
-							<a
-								className="text-xs text-muted-foreground underline hover:text-foreground"
-								href="https://teksafari.org"
-								target="_blank"
-								rel="noreferrer"
-							>
-								teKsafari
-							</a>
-						</div>
+						<p className="text-center text-xs text-muted-foreground">
+							Built with ❤️ by teKsafari
+						</p>
 					</DrawerFooter>
 				</div>
 			</DrawerContent>
