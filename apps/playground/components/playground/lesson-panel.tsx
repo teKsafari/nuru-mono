@@ -17,6 +17,31 @@ export function LessonPanel({ lesson }: LessonPanelProps) {
 
         {lesson.description}
       </div>
+      <div className="p-6 lg:p-8 w-full min-w-0">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl lg:text-3xl font-bold text-foreground">{lesson.title}</h1>
+        </div>
+
+        {lesson.description}
+      </div><div className="p-6 lg:p-8 w-full min-w-0">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl lg:text-3xl font-bold text-foreground">{lesson.title}</h1>
+        </div>
+
+        {lesson.description}
+      </div><div className="p-6 lg:p-8 w-full min-w-0">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl lg:text-3xl font-bold text-foreground">{lesson.title}</h1>
+        </div>
+
+        {lesson.description}
+      </div><div className="p-6 lg:p-8 w-full min-w-0">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl lg:text-3xl font-bold text-foreground">{lesson.title}</h1>
+        </div>
+
+        {lesson.description}
+      </div>
     </ScrollArea>
   )
 }

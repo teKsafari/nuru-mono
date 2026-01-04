@@ -43,7 +43,7 @@ export function Playground({ lesson, executor, simulation }: PlaygroundProps) {
 
   if (isMobile) {
     return (
-      <div className="flex flex-col h-screen bg-background">
+      <div className="flex flex-col flex-1 bg-background">
         <MobileNav activeTab={activeTab} onTabChange={setActiveTab} />
         <div className="flex-1 overflow-hidden">
           {activeTab === "lesson" ? (
@@ -72,7 +72,7 @@ export function Playground({ lesson, executor, simulation }: PlaygroundProps) {
   }
 
   return (
-    <div className="h-screen bg-background">
+    <div className="max-h-full flex-1 bg-background">
       <ResizablePanelGroup direction="horizontal" className="h-full">
         <ResizablePanel defaultSize={35} minSize={20}>
           <LessonPanel lesson={lesson} />
