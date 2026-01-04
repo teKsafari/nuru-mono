@@ -1,20 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
-import { Menu, Github, Sprout } from "lucide-react";
+import React from "react";
+import { Github, Sprout } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { MobileMenuDrawer } from "./mobile-menu-drawer";
 import { LessonsDrawer } from "./lessons-drawer";
 import { AppLogo } from "@/components/app-logo";
 import Link from "next/link";
 
-interface SiteHeaderProps {
-	onMenuClick?: () => void;
-}
-
-export function SiteHeader({ onMenuClick }: SiteHeaderProps) {
+export function SiteHeader() {
 	const pathname = usePathname();
-	const [menuOpen, setMenuOpen] = useState(false);
 
 	const navItems = [
 		{ label: "Home", href: "/", active: pathname === "/" },
@@ -28,8 +22,6 @@ export function SiteHeader({ onMenuClick }: SiteHeaderProps) {
 
 	return (
 		<>
-			<MobileMenuDrawer isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
-
 			{/* Main Header Container */}
 			<header className="sticky left-0 right-0 top-0 z-40 border-b border-border/50 bg-background/80 shadow-sm backdrop-blur-md">
 				<div className="flex h-14 items-center justify-between px-4 md:px-8">
@@ -70,7 +62,7 @@ export function SiteHeader({ onMenuClick }: SiteHeaderProps) {
 						))}
 					</nav>
 
-					{/* Right Section: External Links & Mobile Menu */}
+					{/* Right Section: External Links & Mobile Lessons Drawer */}
 					<div className="flex items-center gap-2 md:order-3">
 						{/* Desktop Only External Links */}
 						<div className="hidden items-center gap-2 border-l border-border/50 pr-2 md:flex">
@@ -97,20 +89,6 @@ export function SiteHeader({ onMenuClick }: SiteHeaderProps) {
 						{/* Mobile Lessons Drawer Trigger */}
 						<div className="md:hidden">
 							<LessonsDrawer />
-						</div>
-
-						{/* Mobile Menu Toggle (Moved to Right) */}
-						<div className="flex items-center md:hidden">
-							<button
-								onClick={() => {
-									setMenuOpen(true);
-									onMenuClick?.();
-								}}
-								className="-mr-2 rounded-md p-2 transition-colors hover:bg-muted"
-								aria-label="Menu"
-							>
-								<Menu className="h-6 w-6" />
-							</button>
 						</div>
 					</div>
 				</div>
