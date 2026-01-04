@@ -75,7 +75,7 @@ export function SiteHeader({ onMenuClick }: SiteHeaderProps) {
 						{/* Desktop Only External Links */}
 						<div className="hidden items-center gap-2 border-l border-border/50 pr-2 md:flex">
 							<a
-								href="https://github.com/NuruProgramming"
+								href="https://github.com/teksafari/nuru"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
