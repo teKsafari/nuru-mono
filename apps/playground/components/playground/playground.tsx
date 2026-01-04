@@ -43,7 +43,7 @@ export function Playground({ lesson, executor, simulation }: PlaygroundProps) {
 
   if (isMobile) {
     return (
-      <div className="flex flex-col flex-1 bg-background">
+      <div className="max-h-full flex flex-col flex-1 bg-background">
         <MobileNav activeTab={activeTab} onTabChange={setActiveTab} />
         <div className="flex-1 overflow-hidden">
           {activeTab === "lesson" ? (
