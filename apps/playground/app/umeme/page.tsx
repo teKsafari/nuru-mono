@@ -1,13 +1,81 @@
 "use client";
 
+import { useEffect, useMemo } from "react";
+import { useNodesState, Node } from "@xyflow/react";
 import { Playground } from "@/components/playground/playground";
-import { ElectronicsDisplay } from "@/components/electronics";
 import { useElectronicsExecutor } from "@/hooks/useElectronicsExecutor";
 import { EXAMPLE_CODE } from "@/lib/electronicsExecutor";
 import type { LessonContent } from "@/types/playground";
+import { LEDNode, BuzzerNode, MotorNode } from "@/components/electronics/nodes";
+
+// Define node types outside component to avoid re-creation
+const nodeTypes = {
+	led: LEDNode,
+	buzzer: BuzzerNode,
+	motor: MotorNode,
+};
+
+const initialNodes: Node[] = [
+	// LEDs
+	{
+		id: "1",
+		type: "led",
+		position: { x: 50, y: 50 },
+		data: { isEnabled: false, color: "red", pin: 1 },
+	},
+	{
+		id: "2",
+		type: "led",
+		position: { x: 150, y: 50 },
+		data: { isEnabled: false, color: "green", pin: 2 },
+	},
+	{
+		id: "3",
+		type: "led",
+		position: { x: 250, y: 50 },
+		data: { isEnabled: false, color: "blue", pin: 3 },
+	},
+	// Buzzer
+	{
+		id: "4",
+		type: "buzzer",
+		position: { x: 80, y: 180 },
+		data: { isEnabled: false, pin: 4 },
+	},
+	// Motor
+	{
+		id: "5",
+		type: "motor",
+		position: { x: 220, y: 180 },
+		data: { isEnabled: false, pin: 5 },
+	},
+];
 
 export default function IntegratedElectronicsPage() {
 	const { executor, components } = useElectronicsExecutor();
+	const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+
+	// Sync executor state to nodes
+	useEffect(() => {
+		setNodes((nds) =>
+			nds.map((node) => {
+				const pin = node.data.pin as number;
+				// Find component state by pin
+				const comp = components.find((c) => c.pin === pin);
+
+				if (comp && comp.isEnabled !== node.data.isEnabled) {
+					return {
+						...node,
+						data: {
+							...node.data,
+							isEnabled: comp.isEnabled,
+						},
+					};
+				}
+				return node;
+			}),
+		);
+	}, [components, setNodes]);
 
 	const lesson: LessonContent = {
 		title: "Elektroniki - Jifunze kudhibiti vifaa kwa Kiswahili",
@@ -16,9 +84,11 @@ export default function IntegratedElectronicsPage() {
 			<div className="space-y-6 leading-relaxed text-muted-foreground">
 				<p>
 					Jifunze kudhibiti vifaa vya elektroniki kama LED, buzzer, na motor kwa
-					kutumia amri rahisi za Kiswahili. Hii ni njia nzuri ya kuelewa jinsi
-					programu inavyodhibiti vifaa vya kimwili.
+					kutumia amri rahisi za Kiswahili. Sasa unaweza pia kupanga vifaa hivi
+					navyo unavyotaka!
 				</p>
+
+				{/* ... (Existing description content) ... */}
 
 				<div className="space-y-3">
 					<h3 className="font-semibold text-foreground">
@@ -52,32 +122,10 @@ export default function IntegratedElectronicsPage() {
 					</ul>
 				</div>
 
-				<div className="space-y-3">
-					<h3 className="font-semibold text-foreground">Vifaa:</h3>
-					<ul className="list-inside list-disc space-y-2">
-						<li>
-							<span className="text-red-500">●</span> LED Nyekundu (1)
-						</li>
-						<li>
-							<span className="text-green-500">●</span> LED Kijani (2)
-						</li>
-						<li>
-							<span className="text-blue-500">●</span> LED Bluu (3)
-						</li>
-						<li>
-							<span className="text-yellow-500">◉</span> Buzzer (4)
-						</li>
-						<li>
-							<span className="text-slate-400">⚙</span> Motor (5)
-						</li>
-					</ul>
-				</div>
-
 				<div className="mt-6 rounded-lg border border-border bg-secondary/50 p-4">
 					<p className="break-words text-sm text-muted-foreground">
 						<span className="font-semibold text-foreground">Kidokezo:</span>{" "}
-						Bonyeza kitufe cha <strong>Run</strong> kuona matokeo ya programu
-						yako kwenye terminali na vifaa vikifanya kazi kwenye simulation.
+						Jaribu kuburuta vifaa hivi kupanga muundo wako!
 					</p>
 				</div>
 			</div>
@@ -88,7 +136,9 @@ export default function IntegratedElectronicsPage() {
 		<Playground
 			lesson={lesson}
 			executor={executor}
-			simulation={<ElectronicsDisplay components={components} />}
+			nodes={nodes}
+			onNodesChange={onNodesChange}
+			nodeTypes={nodeTypes}
 		/>
 	);
 }
