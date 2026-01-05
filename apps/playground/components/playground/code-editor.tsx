@@ -1,5 +1,6 @@
 "use client"
 
+import { useMemo } from "react"
 import CodeMirror from "@uiw/react-codemirror"
 import { go } from "@codemirror/lang-go"
 import { EditorView, keymap } from "@codemirror/view"
@@ -74,16 +75,18 @@ const editorBaseTheme = EditorView.baseTheme({
 })
 
 export function CodeEditor({ code, onChange, onFormat }: CodeEditorProps) {
-  // Create keymap for format shortcut
-  const formatKeymap = onFormat ? keymap.of([
-    {
-      key: "Shift-Alt-f",
-      run: () => {
-        onFormat()
-        return true
+  // Create keymap for format shortcut - memoized to prevent recreation on every render
+  const formatKeymap = useMemo(() => {
+    return onFormat ? keymap.of([
+      {
+        key: "Shift-Alt-f",
+        run: () => {
+          onFormat()
+          return true
+        },
       },
-    },
-  ]) : []
+    ]) : []
+  }, [onFormat])
 
   return (
     <div className="h-full overflow-hidden">

@@ -59,11 +59,6 @@ export function formatCode(code: string): string {
 		if (shouldIncreaseIndent) {
 			indentLevel++;
 		}
-
-		// Special handling for closing braces on the same line
-		if (line.endsWith("{")) {
-			// Already handled by keyword check
-		}
 	}
 
 	return formattedLines.join("\n");
