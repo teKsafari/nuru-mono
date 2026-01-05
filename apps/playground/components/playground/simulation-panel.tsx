@@ -46,7 +46,7 @@ export function SimulationPanel({
 					gap={20}
 					size={1}
 				/>
-				<Controls className="butt border-slate-700 bg-slate-800 text-slate-300 [&>button:hover]:bg-slate-700 [&>button]:border-slate-700 [&>button]:bg-slate-800 [&>button]:text-slate-300" />
+				<Controls className="button border-slate-700 bg-slate-800 text-slate-300 [&>button:hover]:bg-slate-700 [&>button]:border-slate-700 [&>button]:bg-slate-800 [&>button]:text-slate-300" />
 				{content}
 			</ReactFlow>
 		</div>
