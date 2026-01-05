@@ -13,6 +13,6 @@ cp -r ./vendor/github.com/NuruProgramming/Nuru ./deps/
 echo "module github.com/NuruProgramming/Nuru" > ./deps/Nuru/go.mod
 echo "go 1.23.4" >> ./deps/Nuru/go.mod
 
+# replace parts of the interpreter with custom versions
 
-
-# replace?
+pnpm run replace
