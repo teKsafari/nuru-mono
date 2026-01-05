@@ -2,13 +2,14 @@
 
 import CodeMirror from "@uiw/react-codemirror"
 import { go } from "@codemirror/lang-go"
-import { EditorView } from "@codemirror/view"
+import { EditorView, keymap } from "@codemirror/view"
 import { tags } from "@lezer/highlight"
 import { createTheme } from "@uiw/codemirror-themes"
 
 interface CodeEditorProps {
   code: string
   onChange: (code: string) => void
+  onFormat?: () => void
 }
 
 // Custom dark theme matching our design
@@ -72,14 +73,25 @@ const editorBaseTheme = EditorView.baseTheme({
   },
 })
 
-export function CodeEditor({ code, onChange }: CodeEditorProps) {
+export function CodeEditor({ code, onChange, onFormat }: CodeEditorProps) {
+  // Create keymap for format shortcut
+  const formatKeymap = onFormat ? keymap.of([
+    {
+      key: "Shift-Alt-f",
+      run: () => {
+        onFormat()
+        return true
+      },
+    },
+  ]) : []
+
   return (
     <div className="h-full overflow-hidden">
       <CodeMirror
         value={code}
         height="100%"
         theme={playgroundTheme}
-        extensions={[go(), editorBaseTheme]}
+        extensions={[go(), editorBaseTheme, formatKeymap]}
         onChange={(value) => onChange(value)}
         basicSetup={{
           lineNumbers: true,

@@ -10,14 +10,6 @@ export const viewport: Viewport = {
 
 import './globals.css'
 import { SiteHeader } from '@/components/header'
-import { JetBrains_Mono } from 'next/font/google'
-
-const jetbrainsMono = JetBrains_Mono({ 
-  subsets: ['latin'],
-  display: 'swap',
-  weight: ['400', '500', '700'],
-  variable: '--font-jetbrains-mono',
-})
 
 export const metadata: Metadata = {
   title: 'nuru playground',
@@ -37,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`dark ${jetbrainsMono.variable}`}>
+    <html lang="en" suppressHydrationWarning className="dark">
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="icon" href="/favicon/icon.svg" sizes="any" type="image/svg+xml" />
@@ -45,7 +37,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#00b4d8" />
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className={cn(jetbrainsMono.className, "flex flex-col h-[100dvh]")}>
+      <body className={cn("flex flex-col h-[100dvh] font-mono")}>
           <SiteHeader />
           {/* 
           h-0 sets an explicit height so that the height of the div is not derived from the height
