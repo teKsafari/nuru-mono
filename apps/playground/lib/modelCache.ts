@@ -61,10 +61,18 @@ class ModelCache {
 			const data = await response.json();
 			return data.hash;
 		} catch (error) {
-			console.warn("Failed to fetch model hash, using URL-based fallback:", error);
+			console.warn(
+				"Failed to fetch model hash, using URL-based fallback:",
+				error,
+			);
 			// Return a stable hash based on the URL to avoid unnecessary cache misses
-			// This allows the cache to work even when the API is unavailable
-			return `fallback-${btoa(url)}`;
+			// Use encodeURIComponent for proper encoding instead of btoa which has Unicode issues
+			try {
+				return `fallback-${encodeURIComponent(url).replace(/%/g, "_")}`;
+			} catch (encodeError) {
+				// If encoding fails, use a simple hash
+				return `fallback-simple-${url.length}-${Date.now()}`;
+			}
 		}
 	}
 
@@ -195,7 +203,7 @@ class ModelCache {
 		await this.init();
 		if (!this.db) {
 			console.warn("[ModelCache] Database not initialized, cannot clear cache");
-			return;
+			return Promise.resolve();
 		}
 
 		return new Promise((resolve, reject) => {
