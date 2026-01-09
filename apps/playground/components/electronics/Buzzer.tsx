@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useRef, useEffect, useState } from "react";
+import "@wokwi/elements";
 
 interface BuzzerProps {
 	isEnabled: boolean;
@@ -12,6 +12,11 @@ export function Buzzer({ isEnabled, pin }: BuzzerProps) {
 	const audioContextRef = useRef<AudioContext | null>(null);
 	const oscillatorRef = useRef<OscillatorNode | null>(null);
 	const gainNodeRef = useRef<GainNode | null>(null);
+	const [mounted, setMounted] = useState(false);
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
 
 	useEffect(() => {
 		// Initialize audio context on first render
@@ -87,62 +92,16 @@ export function Buzzer({ isEnabled, pin }: BuzzerProps) {
 		};
 	}, [isEnabled]);
 
+	if (!mounted) {
+		return <div className="h-[75px] w-[75px]" />;
+	}
+
 	return (
 		<div className="flex flex-col items-center">
-			<motion.div
-				className={`h-20 w-20 rounded-full border-4 bg-slate-800 dark:bg-slate-900 ${isEnabled ? "border-yellow-400" : "border-slate-600 dark:border-slate-700"} relative flex items-center justify-center`}
-				animate={isEnabled ? { rotate: [0, 5, -5, 0] } : {}}
-				transition={{
-					repeat: isEnabled ? Number.POSITIVE_INFINITY : 0,
-					duration: 0.2,
-				}}
-			>
-				<span className="absolute top-1 text-xs font-bold text-white opacity-70">
-					{pin}
-				</span>
-				<div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-700 dark:bg-slate-800">
-					<div
-						className={`h-6 w-6 rounded-full ${isEnabled ? "bg-yellow-400" : "bg-slate-600 dark:bg-slate-700"}`}
-					></div>
-				</div>
-
-				{isEnabled && (
-					<>
-						<motion.div
-							className="absolute -inset-1 rounded-full border-2 border-yellow-400 opacity-70"
-							initial={{ scale: 1, opacity: 0.7 }}
-							animate={{ scale: 1.2, opacity: 0 }}
-							transition={{
-								repeat: Number.POSITIVE_INFINITY,
-								duration: 0.8,
-								ease: "easeOut",
-							}}
-						/>
-						<motion.div
-							className="absolute -inset-3 rounded-full border-2 border-yellow-300 opacity-50"
-							initial={{ scale: 1, opacity: 0.5 }}
-							animate={{ scale: 1.4, opacity: 0 }}
-							transition={{
-								repeat: Number.POSITIVE_INFINITY,
-								duration: 1,
-								ease: "easeOut",
-							}}
-						/>
-						<motion.div
-							className="absolute -inset-5 rounded-full border-2 border-yellow-200 opacity-30"
-							initial={{ scale: 1, opacity: 0.3 }}
-							animate={{ scale: 1.6, opacity: 0 }}
-							transition={{
-								repeat: Number.POSITIVE_INFINITY,
-								duration: 1.2,
-								ease: "easeOut",
-							}}
-						/>
-					</>
-				)}
-			</motion.div>
+			{/* @ts-ignore - Web Component */}
+			<wokwi-buzzer hasSignal={isEnabled} />
 			<div className="mt-1 text-xs text-slate-600 dark:text-slate-400">
-				BUZZER
+				BUZZER {pin}
 			</div>
 		</div>
 	);
