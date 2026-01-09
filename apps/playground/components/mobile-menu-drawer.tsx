@@ -27,7 +27,7 @@ export function MobileMenuDrawer({ isOpen, onClose }: MobileMenuDrawerProps) {
 		{
 			icon: <Github className="h-5 w-5" />,
 			label: "GitHub",
-			href: "https://github.com/teksafari/nuru",
+			href: "https://github.com/nuruprogramming",
 		},
 		{
 			icon: <Sprout className="h-5 w-5 text-[#00b4d8]" />,

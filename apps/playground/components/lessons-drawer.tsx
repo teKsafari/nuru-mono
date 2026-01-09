@@ -86,7 +86,7 @@ export function LessonsDrawer() {
 						<div className="flex w-full justify-center gap-6">
 							<a
 								className="text-xs text-muted-foreground underline hover:text-foreground"
-								href="https://github.com/teksafari/nuru"
+								href="https://github.com/nuruprogramming"
 								target="_blank"
 								rel="noreferrer"
 							>
