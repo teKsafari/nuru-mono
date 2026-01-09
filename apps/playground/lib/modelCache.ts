@@ -193,7 +193,10 @@ class ModelCache {
 	 */
 	async clearCache(): Promise<void> {
 		await this.init();
-		if (!this.db) return;
+		if (!this.db) {
+			console.warn("[ModelCache] Database not initialized, cannot clear cache");
+			return;
+		}
 
 		return new Promise((resolve, reject) => {
 			const transaction = this.db!.transaction(STORE_NAME, "readwrite");

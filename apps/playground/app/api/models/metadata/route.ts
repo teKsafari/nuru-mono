@@ -50,7 +50,8 @@ export async function GET(request: NextRequest) {
 				timestamp: Date.now(),
 			});
 		} catch (fileError) {
-			console.error("[ModelMetadata] File read error:", fileError);
+			// Don't log detailed error to avoid leaking file system information
+			console.error("[ModelMetadata] Failed to read model file");
 			return NextResponse.json(
 				{ error: "Model file not found or cannot be read" },
 				{ status: 404 },

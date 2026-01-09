@@ -71,12 +71,21 @@ function ArduinoModel({
 		let mounted = true;
 		let blobUrl: string | null = null;
 
-		modelCache.loadModel(modelPath).then((url) => {
-			if (mounted) {
-				blobUrl = url;
-				setCachedModelUrl(url);
-			}
-		});
+		modelCache
+			.loadModel(modelPath)
+			.then((url) => {
+				if (mounted) {
+					blobUrl = url;
+					setCachedModelUrl(url);
+				}
+			})
+			.catch((error) => {
+				console.error("[ArduinoModel] Failed to load model:", error);
+				// Fall back to using the direct model path
+				if (mounted) {
+					setCachedModelUrl(modelPath);
+				}
+			});
 
 		return () => {
 			mounted = false;
