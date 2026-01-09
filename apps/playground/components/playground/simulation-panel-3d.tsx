@@ -69,11 +69,9 @@ function ArduinoModel({
 	// Load model through cache
 	useEffect(() => {
 		let mounted = true;
-		let objectUrl: string | null = null;
 
 		modelCache.loadModel(modelPath).then((url) => {
 			if (mounted) {
-				objectUrl = url;
 				setCachedModelUrl(url);
 			}
 		});
@@ -81,11 +79,11 @@ function ArduinoModel({
 		return () => {
 			mounted = false;
 			// Clean up blob URL if it was created
-			if (objectUrl && objectUrl.startsWith("blob:")) {
-				URL.revokeObjectURL(objectUrl);
+			if (cachedModelUrl && cachedModelUrl.startsWith("blob:")) {
+				URL.revokeObjectURL(cachedModelUrl);
 			}
 		};
-	}, [modelPath]);
+	}, [modelPath, cachedModelUrl]);
 
 	const dracoLoader = useMemo(() => {
 		const loader = new DRACOLoader();

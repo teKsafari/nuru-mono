@@ -33,20 +33,29 @@ export async function GET(request: NextRequest) {
 
 		// Read the file from the public directory
 		const fullPath = join(process.cwd(), "public", filePath);
-		const fileBuffer = await readFile(fullPath);
+		
+		try {
+			const fileBuffer = await readFile(fullPath);
 
-		// Calculate hash
-		const hash = createHash("sha256").update(fileBuffer).digest("hex");
+			// Calculate hash
+			const hash = createHash("sha256").update(fileBuffer).digest("hex");
 
-		// Get file size
-		const size = fileBuffer.length;
+			// Get file size
+			const size = fileBuffer.length;
 
-		return NextResponse.json({
-			url,
-			hash,
-			size,
-			timestamp: Date.now(),
-		});
+			return NextResponse.json({
+				url,
+				hash,
+				size,
+				timestamp: Date.now(),
+			});
+		} catch (fileError) {
+			console.error("[ModelMetadata] File read error:", fileError);
+			return NextResponse.json(
+				{ error: "Model file not found or cannot be read" },
+				{ status: 404 },
+			);
+		}
 	} catch (error) {
 		console.error("[ModelMetadata] Error:", error);
 		return NextResponse.json(

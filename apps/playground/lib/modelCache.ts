@@ -61,9 +61,10 @@ class ModelCache {
 			const data = await response.json();
 			return data.hash;
 		} catch (error) {
-			console.warn("Failed to fetch model hash, skipping cache validation:", error);
-			// Return a timestamp-based hash as fallback
-			return `fallback-${Date.now()}`;
+			console.warn("Failed to fetch model hash, using URL-based fallback:", error);
+			// Return a stable hash based on the URL to avoid unnecessary cache misses
+			// This allows the cache to work even when the API is unavailable
+			return `fallback-${btoa(url)}`;
 		}
 	}
 
