@@ -9,6 +9,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import type { OrbitControls as OrbitControlsType } from "three-stdlib";
 import type { Node } from "@xyflow/react";
+import { modelCache } from "@/lib/modelCache";
 
 interface SimulationPanel3DProps {
 	nodes: Node[];
@@ -63,6 +64,38 @@ function ArduinoModel({
 	nodes: Node[];
 	modelPath: string;
 }) {
+	const [cachedModelUrl, setCachedModelUrl] = useState<string | null>(null);
+
+	// Load model through cache
+	useEffect(() => {
+		let mounted = true;
+		let blobUrl: string | null = null;
+
+		modelCache
+			.loadModel(modelPath)
+			.then((url) => {
+				if (mounted) {
+					blobUrl = url;
+					setCachedModelUrl(url);
+				}
+			})
+			.catch((error) => {
+				console.error("[ArduinoModel] Failed to load model:", error);
+				// Fall back to using the direct model path
+				if (mounted) {
+					setCachedModelUrl(modelPath);
+				}
+			});
+
+		return () => {
+			mounted = false;
+			// Clean up blob URL if it was created
+			if (blobUrl && blobUrl.startsWith("blob:")) {
+				URL.revokeObjectURL(blobUrl);
+			}
+		};
+	}, [modelPath]);
+
 	const dracoLoader = useMemo(() => {
 		const loader = new DRACOLoader();
 		loader.setDecoderPath(
@@ -72,9 +105,13 @@ function ArduinoModel({
 		return loader;
 	}, []);
 
-	const gltf = useLoader(GLTFLoader, modelPath, (loader) => {
-		loader.setDRACOLoader(dracoLoader);
-	});
+	const gltf = useLoader(
+		GLTFLoader,
+		cachedModelUrl || modelPath,
+		(loader) => {
+			loader.setDRACOLoader(dracoLoader);
+		},
+	);
 
 	const clonedScene = useMemo(() => gltf.scene.clone(), [gltf.scene]);
 

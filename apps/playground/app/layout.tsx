@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 
 import {cn} from "@/lib/utils"
+import { ModelPreloader } from '@/components/model-preloader'
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -46,6 +47,7 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body className={cn(jetbrainsMono.className, "flex flex-col h-[100dvh]")}>
+          <ModelPreloader />
           <SiteHeader />
           {/* 
           h-0 sets an explicit height so that the height of the div is not derived from the height
