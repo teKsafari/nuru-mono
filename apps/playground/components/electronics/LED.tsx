@@ -25,7 +25,7 @@ export function LED({ isEnabled, color = "red", pin }: LEDProps) {
 			{/* @ts-ignore - Web Component */}
 			<wokwi-led color={color} value={isEnabled} label={pin.toString()} />
 			<div className="mt-1 text-xs text-slate-600 dark:text-slate-400">
-				{color.toUpperCase()}
+				{/* {color.toUpperCase()} */}
 			</div>
 		</div>
 	);
