@@ -4,3 +4,4 @@ main.exe
 
 # Ignore vendor directory
 vendor/*
+deps/*
