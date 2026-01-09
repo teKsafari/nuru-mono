@@ -148,12 +148,40 @@ class ModelCache {
 	}
 
 	/**
-	 * Preload a model in the background
+	 * Preload a model in the background (caches without creating blob URL)
 	 * @param url The URL of the model to preload
 	 */
 	async preloadModel(url: string): Promise<void> {
 		try {
-			await this.loadModel(url);
+			// Fetch the current hash from server
+			const currentHash = await this.fetchModelHash(url);
+
+			// Check if we have a cached version
+			const cached = await this.getCached(url);
+
+			// If cached and hash matches, we're done
+			if (cached && cached.hash === currentHash) {
+				console.log(`[ModelCache] Model already cached: ${url}`);
+				return;
+			}
+
+			// Fetch fresh model
+			console.log(`[ModelCache] Preloading model: ${url}`);
+			const response = await fetch(url);
+			if (!response.ok) {
+				throw new Error(`Failed to fetch model: ${response.status}`);
+			}
+
+			const blob = await response.blob();
+
+			// Store in cache
+			await this.setCached({
+				url,
+				hash: currentHash,
+				blob,
+				timestamp: Date.now(),
+			});
+
 			console.log(`[ModelCache] Preloaded model: ${url}`);
 		} catch (error) {
 			console.warn(`[ModelCache] Failed to preload model: ${url}`, error);
