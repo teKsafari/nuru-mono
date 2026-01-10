@@ -46,7 +46,10 @@ ${JSON.stringify({
 User Instruction: "${prompt}"
 
 Task: Generate a NEW or MODIFIED lesson/code/simulation based on the instruction.
-- If "next lesson", create the logical next step in learning (advancing the topic). **YOU MAY CHANGE THE SIMULATION** if the next topic requires it (e.g., moving from blinking LED to motor control, or traffic lights). Do not feel constrained to the current simulation ID.
+- If "next lesson", create the logical next step in learning (advancing the topic).
+    - **CRITICAL: You MUST re-evaluate the best simulation for the new topic.**
+    - If moving from simple blinking to a new concept (e.g. traffic lights, motors, sensors), CHANGE the simulationId.
+    - Do NOT default to the simulationId in the context unless it is strictly the best fit for the NEW topic.
 - If "harder", increase complexity (e.g., use loops, variables, more components).
 - If specific tweak (e.g., "change to blue"), apply it.
 - Maintain the same output JSON structure.
@@ -76,7 +79,10 @@ Nuru Language Reference:
 
 IMPORTANT constraints:
 - **NO \`andika(...)\`**: The \`andika\` function is NOT supported. DO NOT use it.
-- **NO Conditionals**: DO NOT use \`if\`, \`else\`, \`kama\`, or any other conditional logic. The code must be linear or loop-based only.
+- **ABSOLUTELY NO CONDITIONALS**: You MUST NOT use \`if\`, \`else\`, \`switch\`, \`kama\`, or any conditional logic.
+- **NO WHILE/FOR LOOPS**: You MUST NOT use \`while\`, \`for\`, or \`do\`.
+- **ONLY \`rudia\`**: The ONLY allowed control flow is \`rudia(n) { ... }\` for simple repetition.
+- **LINEAR EXECUTION ONLY**: The code must be a simple linear sequence of commands or simple repetitions.
 - Always use NUMBERS for pin arguments, never strings like "RED" or "1". Example: \`washa(1)\` is correct, \`washa("RED")\` is WRONG.
 - DO NOT include comments in the code (lines starting with //). The code should be clean.
 
