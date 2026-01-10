@@ -18,9 +18,17 @@ interface SimulationPanel3DProps {
 
 const LED_CONFIG = {
 	RED: { color: 0xff0000, offColor: 0x440000 },
-	BLUE: { color: 0x22c55e, offColor: 0x0a3d1f }, // Middle LED, renders green, pin 2
-	YELLOW: { color: 0x3b82f6, offColor: 0x0f1e3d }, // Right LED, renders blue, pin 3
+	GREEN: { color: 0x22c55e, offColor: 0x0a3d1f },
+	BLUE: { color: 0x3b82f6, offColor: 0x0f1e3d },
 } as const;
+
+const COMPONENT_PINS: Record<string, number> = {
+	RED: 1,
+	GREEN: 2,
+	BLUE: 3,
+	BUZZER: 4,
+	SHAFT: 5,
+};
 
 function ZoomTracker({
 	controlsRef,
@@ -56,6 +64,135 @@ function SceneLoader() {
 	);
 }
 
+function useBuzzerAudio(isEnabled: boolean) {
+	const audioContextRef = useRef<AudioContext | null>(null);
+	const oscillatorRef = useRef<OscillatorNode | null>(null);
+	const gainNodeRef = useRef<GainNode | null>(null);
+
+	useEffect(() => {
+		if (!audioContextRef.current) {
+			try {
+				audioContextRef.current = new (
+					window.AudioContext ||
+					(window as unknown as { webkitAudioContext: typeof AudioContext })
+						.webkitAudioContext
+				)();
+			} catch {
+				console.warn("Web Audio API not supported");
+			}
+		}
+
+		if (isEnabled && audioContextRef.current) {
+			try {
+				if (audioContextRef.current.state === "suspended") {
+					audioContextRef.current.resume();
+				}
+
+				const oscillator = audioContextRef.current.createOscillator();
+				const gainNode = audioContextRef.current.createGain();
+
+				oscillator.frequency.setValueAtTime(
+					1200,
+					audioContextRef.current.currentTime,
+				);
+				oscillator.type = "sine";
+				gainNode.gain.setValueAtTime(0.1, audioContextRef.current.currentTime);
+
+				oscillator.connect(gainNode);
+				gainNode.connect(audioContextRef.current.destination);
+				oscillator.start();
+
+				oscillatorRef.current = oscillator;
+				gainNodeRef.current = gainNode;
+			} catch (error) {
+				console.warn("Could not create buzzer sound:", error);
+			}
+		} else if (!isEnabled && oscillatorRef.current) {
+			try {
+				oscillatorRef.current.stop();
+				oscillatorRef.current = null;
+				gainNodeRef.current = null;
+			} catch {}
+		}
+
+		return () => {
+			if (oscillatorRef.current) {
+				try {
+					oscillatorRef.current.stop();
+				} catch {}
+				oscillatorRef.current = null;
+				gainNodeRef.current = null;
+			}
+		};
+	}, [isEnabled]);
+}
+
+function useMotorAudio(isEnabled: boolean) {
+	const audioRef = useRef<HTMLAudioElement | null>(null);
+	const fadeIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+	useEffect(() => {
+		const fadeDuration = 300; // ms
+		const fadeSteps = 15;
+		const stepTime = fadeDuration / fadeSteps;
+		const targetVolume = 0.3;
+
+		if (isEnabled) {
+			if (!audioRef.current) {
+				audioRef.current = new Audio("/sounds/motor.mp3");
+				audioRef.current.loop = true;
+				audioRef.current.volume = 0;
+			}
+
+			if (fadeIntervalRef.current) {
+				clearInterval(fadeIntervalRef.current);
+			}
+
+			audioRef.current.play().catch(() => {
+				console.warn("Motor sound blocked by browser autoplay policy");
+			});
+
+			let step = 0;
+			fadeIntervalRef.current = setInterval(() => {
+				if (audioRef.current && step < fadeSteps) {
+					audioRef.current.volume = (step / fadeSteps) * targetVolume;
+					step++;
+				} else if (fadeIntervalRef.current) {
+					clearInterval(fadeIntervalRef.current);
+				}
+			}, stepTime);
+		} else if (audioRef.current) {
+			if (fadeIntervalRef.current) {
+				clearInterval(fadeIntervalRef.current);
+			}
+
+			let step = fadeSteps;
+			const currentVolume = audioRef.current.volume;
+
+			fadeIntervalRef.current = setInterval(() => {
+				if (audioRef.current && step > 0) {
+					audioRef.current.volume = (step / fadeSteps) * currentVolume;
+					step--;
+				} else {
+					if (fadeIntervalRef.current) {
+						clearInterval(fadeIntervalRef.current);
+					}
+					if (audioRef.current) {
+						audioRef.current.pause();
+						audioRef.current.currentTime = 0;
+					}
+				}
+			}, stepTime);
+		}
+
+		return () => {
+			if (fadeIntervalRef.current) {
+				clearInterval(fadeIntervalRef.current);
+			}
+		};
+	}, [isEnabled]);
+}
+
 function ArduinoModel({
 	nodes,
 	modelPath,
@@ -77,20 +214,42 @@ function ArduinoModel({
 	});
 
 	const clonedScene = useMemo(() => gltf.scene.clone(), [gltf.scene]);
+	const shaftRef = useRef<THREE.Object3D | null>(null);
+
+	const motorOn =
+		nodes.find((n) => n.data?.pin === 5)?.data?.isEnabled ?? false;
+	const buzzerOn =
+		nodes.find((n) => n.data?.pin === 4)?.data?.isEnabled ?? false;
+
+	useBuzzerAudio(buzzerOn);
+	useMotorAudio(motorOn);
 
 	useEffect(() => {
-		const ledStates: Record<string, boolean> = {
-			RED: nodes.find((n) => n.data?.pin === 1)?.data?.isEnabled ?? false,
-			BLUE: nodes.find((n) => n.data?.pin === 2)?.data?.isEnabled ?? false, // Middle, green
-			YELLOW: nodes.find((n) => n.data?.pin === 3)?.data?.isEnabled ?? false, // Right, blue
-		};
+		clonedScene.traverse((child) => {
+			if (child.name.toUpperCase() === "SHAFT") {
+				shaftRef.current = child;
+			}
+		});
+	}, [clonedScene]);
+
+	useFrame((_, delta) => {
+		if (shaftRef.current && motorOn) {
+			shaftRef.current.rotation.z += delta * 15;
+		}
+	});
+
+	useEffect(() => {
+		const getIsEnabled = (pin: number) =>
+			nodes.find((n) => n.data?.pin === pin)?.data?.isEnabled ?? false;
 
 		clonedScene.traverse((child) => {
 			if (child instanceof THREE.Mesh) {
 				const nodeName = child.name.toUpperCase();
+
 				if (nodeName in LED_CONFIG) {
 					const config = LED_CONFIG[nodeName as keyof typeof LED_CONFIG];
-					const isOn = ledStates[nodeName];
+					const pin = COMPONENT_PINS[nodeName];
+					const isOn = getIsEnabled(pin);
 
 					if (!child.userData.materialCloned) {
 						child.material = (child.material as THREE.Material).clone();
@@ -126,6 +285,7 @@ function Scene({
 	controlsRef: React.RefObject<OrbitControlsType | null>;
 	onZoomChange: (scale: number) => void;
 }) {
+	// Bloom only for LEDs (pins 1-3), not buzzer/motor
 	const anyLedOn = [1, 2, 3].some(
 		(pin) => nodes.find((n) => n.data?.pin === pin)?.data?.isEnabled,
 	);
@@ -156,7 +316,7 @@ function Scene({
 export function SimulationPanel3D({
 	nodes,
 	onToggleView,
-	modelPath = "/models/Arduino.glb",
+	modelPath = "/models/Arduino-nuru.glb",
 }: SimulationPanel3DProps) {
 	const controlsRef = useRef<OrbitControlsType>(null);
 	const cameraRef = useRef<THREE.PerspectiveCamera>(null);
