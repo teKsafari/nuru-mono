@@ -9,7 +9,7 @@
 		"test": "echo \"Mocktest Wasm-core  🟢 🟢 🟢 🟢\" && exit 0 >> /dev/null",
 		"build:wasm": "pnpm run replace && GOOS=js GOARCH=wasm tinygo build -o main.wasm",
 		"build": "tsc",
-		"dev": "tsc --watch",
+		"dev": "tsc --watch & go run cmd/server/main.go",
 		"replace": "cp -r ./modified/* ./deps/Nuru/"
 	},
 	"type": "module",
