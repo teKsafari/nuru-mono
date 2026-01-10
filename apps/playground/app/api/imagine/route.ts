@@ -46,7 +46,7 @@ ${JSON.stringify({
 User Instruction: "${prompt}"
 
 Task: Generate a NEW or MODIFIED lesson/code/simulation based on the instruction.
-- If "next lesson", create the logical next step in learning (advancing the topic).
+- If "next lesson", create the logical next step in learning (advancing the topic). **YOU MAY CHANGE THE SIMULATION** if the next topic requires it (e.g., moving from blinking LED to motor control, or traffic lights). Do not feel constrained to the current simulation ID.
 - If "harder", increase complexity (e.g., use loops, variables, more components).
 - If specific tweak (e.g., "change to blue"), apply it.
 - Maintain the same output JSON structure.
@@ -72,10 +72,11 @@ Nuru Language Reference:
 - \`zima(pin)\`: Turn off LED/device at pin. Argument \`pin\` MUST be an integer (e.g., \`zima(1)\`), NOT a string.
 - \`subiri(ms)\`: Wait for milliseconds.
 - \`rudia(n) { ... }\`: Repeat n times.
-- \`andika(text)\`: Print text.
 - Variables are defined without keywords (e.g., \`x = 10\`).
 
-IMPORTANT: 
+IMPORTANT constraints:
+- **NO \`andika(...)\`**: The \`andika\` function is NOT supported. DO NOT use it.
+- **NO Conditionals**: DO NOT use \`if\`, \`else\`, \`kama\`, or any other conditional logic. The code must be linear or loop-based only.
 - Always use NUMBERS for pin arguments, never strings like "RED" or "1". Example: \`washa(1)\` is correct, \`washa("RED")\` is WRONG.
 - DO NOT include comments in the code (lines starting with //). The code should be clean.
 
