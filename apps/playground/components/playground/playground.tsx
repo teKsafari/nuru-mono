@@ -83,6 +83,9 @@ export function Playground({
 							onNodesChange={onNodesChange}
 							nodeTypes={nodeTypes}
 							content={simulation}
+							onRun={handleRun}
+							onSubmit={handleSubmit}
+							onShowSolution={handleShowSolution}
 						/>
 					) : (
 						<div className="flex h-full w-full items-center justify-center">
