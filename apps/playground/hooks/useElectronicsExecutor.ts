@@ -14,6 +14,7 @@ interface UseElectronicsExecutorReturn {
 	programState: ProgramState;
 	currentLine: number;
 	resetComponents: () => void;
+	updateConfig: (config: Partial<import("@/types/electronics").ExecutorConfig>) => void;
 }
 
 /**
@@ -127,11 +128,18 @@ export function useElectronicsExecutor(): UseElectronicsExecutorReturn {
 		},
 	};
 
+	const updateConfig = useCallback((config: Partial<import("@/types/electronics").ExecutorConfig>) => {
+		if (executorRef.current) {
+			executorRef.current.updateConfig(config);
+		}
+	}, []);
+
 	return {
 		executor,
 		components,
 		programState,
 		currentLine,
 		resetComponents,
+		updateConfig,
 	};
 }

@@ -9,7 +9,7 @@ const deployment = "gpt-4.1-mini"; // Using the deployment name from user reques
 
 export async function POST(req: Request) {
 	try {
-		const { prompt } = await req.json();
+		const { prompt, context } = await req.json();
 
 		if (!prompt) {
 			return NextResponse.json(
@@ -30,6 +30,28 @@ export async function POST(req: Request) {
 			apiVersion,
 			deployment,
 		});
+
+        let contextInstruction = "";
+        if (context) {
+            contextInstruction = `
+CONTEXT_MODIFICATION_MODE:
+The user wants to modify the following existing lesson:
+${JSON.stringify({
+    simulationId: context.simulationId,
+    code: context.code,
+    lessonTitle: context.lesson?.title,
+    lessonDescription: context.lesson?.description
+}, null, 2)}
+
+User Instruction: "${prompt}"
+
+Task: Generate a NEW or MODIFIED lesson/code/simulation based on the instruction.
+- If "next lesson", create the logical next step in learning (advancing the topic).
+- If "harder", increase complexity (e.g., use loops, variables, more components).
+- If specific tweak (e.g., "change to blue"), apply it.
+- Maintain the same output JSON structure.
+`;
+        }
 
 		const systemPrompt = `
 You are an expert computer science teacher for Swahili speakers.
@@ -57,14 +79,27 @@ IMPORTANT:
 - Always use NUMBERS for pin arguments, never strings like "RED" or "1". Example: \`washa(1)\` is correct, \`washa("RED")\` is WRONG.
 - DO NOT include comments in the code (lines starting with //). The code should be clean.
 
+SCOPE MANAGEMENT & CREATIVITY:
+1. **Ambitious Requests**: If the user asks for something too complex (e.g., "AI Robot", "Self-driving car", "Supercomputer"), DO NOT REJECT IT. Instead, breaking it down to the FUNDAMENTALS.
+   - Example directly: "I want to build a self-driving car." -> Response: Use the 'motor-control' simulation and explain "To build a self-driving car, we first need to understand how to control motors."
+2. **Unrelated Fields**: If the user asks for something unrelated (e.g., "How to cook rice", "Fashion design"), DO NOT REJECT IT. Instead, CONNECT IT to electronics/coding.
+   - Example: "Cooking rice" -> Response: Use 'traffic-lights' (as a timer) or 'police-siren' (alarm) and explain "In cooking, timing is key. Let's build a timer for your rice."
+   - Example: "Fashion" -> Response: Use 'basic-blink' and explain "Wearable technology starts with simple circuits like this."
+3. **Rejection**: Only set \`isRelevant: false\` if the prompt is:
+   - Offensive, hateful, or inappropriate.
+   - Complete gibberish that cannot be interpreted.
+   - Asking for dangerous/illegal acts.
+
+${contextInstruction}
+
 Output format: JSON object with the following structure:
 {
-    "isRelevant": boolean, // true if the prompt is related to electronics/coding
+    "isRelevant": boolean, // true if the prompt is related OR can be creatively connected
     "simulationId": string, // One of the available simulation IDs
     "code": string, // Valid Nuru code to demonstrate the concept on the selected simulation
     "lesson": {
         "title": string, // Catchy title in Swahili
-        "description": string, // 2-3 sentences explaining the concept in Swahili
+        "description": string, // 2-3 sentences explaining the concept in Swahili. IF you pivoted the topic (e.g. cooking -> timer), explain the connection here.
         "steps": string[] // 3-4 bullet points in Swahili explaining how the code works
     },
     "refusalMessage": string // (Optional) Polite refusal in Swahili if isRelevant is false

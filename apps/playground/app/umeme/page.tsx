@@ -52,8 +52,17 @@ const initialNodes: Node[] = [
 ];
 
 export default function IntegratedElectronicsPage() {
-	const { executor, components } = useElectronicsExecutor();
+	const { executor, components, updateConfig } = useElectronicsExecutor();
 	const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+
+    // Ensure executor has enough components for these nodes
+    useEffect(() => {
+        const maxPin = initialNodes.reduce((max, node) => {
+            const pin = node.data?.pin as number | undefined;
+            return pin ? Math.max(max, pin) : max;
+        }, 5);
+        updateConfig({ componentCount: Math.max(maxPin, 20) }); // Default to at least 20 for experimentation
+    }, [updateConfig]);
 
 	// Sync executor state to nodes
 	useEffect(() => {

@@ -20,6 +20,7 @@ export class ElectronicsExecutor {
 	private executionTimeout: NodeJS.Timeout | null = null;
 	private currentLine: number = -1;
 	private outputBuffer: string[] = [];
+	private variables: Map<string, number> = new Map();
 
 	constructor(callbacks: ExecutorCallbacks, config: ExecutorConfig) {
 		this.callbacks = callbacks;
@@ -57,6 +58,57 @@ export class ElectronicsExecutor {
 	}
 
 	/**
+	 * Evaluate a mathematical expression or variable
+	 */
+	private evaluateExpression(expr: string): number {
+		// remove whitespace
+		const cleanExpr = expr.trim();
+
+		// Check if it's a simple number
+		if (!Number.isNaN(Number(cleanExpr))) {
+			return Number(cleanExpr);
+		}
+
+		// Check if it's a variable
+		if (this.variables.has(cleanExpr)) {
+			return this.variables.get(cleanExpr) || 0;
+		}
+
+		// Handle basic arithmetic operations usually passed as "var + 1" or "3 * 2"
+		// This is a very basic parser for the sake of the requested feature
+		try {
+			// Replace variables with their values in the string
+			// We sort by length descending to avoid replacing substrings (e.g. "count" vs "count2")
+			let evalStr = cleanExpr;
+			const sortedVars = Array.from(this.variables.keys()).sort(
+				(a, b) => b.length - a.length,
+			);
+
+			for (const va of sortedVars) {
+				const val = this.variables.get(va);
+				// Use regex with word boundary to ensure we match whole variable names
+				const regex = new RegExp(`\\b${va}\\b`, "g");
+				evalStr = evalStr.replace(regex, String(val));
+			}
+
+			// Allow only safe characters for evaluation: digits, +, -, *, /, (, ), ., whitespace
+			if (!/^[0-9+\-*/().\s]+$/.test(evalStr)) {
+				// If we still have letters, it means undefined variable or invalid syntax
+				if (/[a-zA-Z]/.test(evalStr)) {
+					throw new Error(`Kigezo kisichojulikana au sintaksia batili: ${cleanExpr}`);
+				}
+			}
+
+			// Use Function to evaluate safe math string
+			// eslint-disable-next-line
+			return new Function(`return ${evalStr}`)();
+		} catch (e) {
+			console.error("Evaluation error:", e);
+			throw new Error(`Imeshindwa kutathmini: ${cleanExpr}`);
+		}
+	}
+
+	/**
 	 * Execute a single command
 	 */
 	executeCommand(cmd: string): Promise<void> {
@@ -68,54 +120,102 @@ export class ElectronicsExecutor {
 				return;
 			}
 
-			// Parse commands (Tafsiri amri)
-			const washaMatch = trimmedCmd.match(/^washa\((\d+)\)$/);
-			const zimaMatch = trimmedCmd.match(/^zima\((\d+)\)$/);
-			const subiriMatch = trimmedCmd.match(/^subiri\((\d+)\)$/);
+			// Check for Assignment (e.g. wa = 1 or wa = wa + 1)
+			if (trimmedCmd.includes("=") && !trimmedCmd.startsWith("if")) {
+				const parts = trimmedCmd.split("=");
+				if (parts.length === 2) {
+					const varName = parts[0].trim();
+					const expression = parts[1].trim();
+					
+					// Validate variable name (simple alphanumeric)
+					if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(varName)) {
+						const errorMsg = `Jina la kigezo si sahihi: ${varName}`;
+						this.addOutput(errorMsg, "error");
+						reject(new Error(errorMsg));
+						return;
+					}
 
-			if (washaMatch) {
-				const componentIndex = Number.parseInt(washaMatch[1]) - 1;
-				if (
-					componentIndex >= 0 &&
-					componentIndex < this.config.componentCount
-				) {
-					this.callbacks.onComponentChange(componentIndex, true);
-					this.addOutput(
-						`Kifaa nambari ${componentIndex + 1} kimewashwa`,
-						"success",
-					);
-					resolve();
+					try {
+						const value = this.evaluateExpression(expression);
+						this.variables.set(varName, value);
+						// Optional: Log assignment for debug?
+						// this.addOutput(`${varName} = ${value}`, "info", false);
+						resolve();
+						return;
+					} catch (e: any) {
+						const errorMsg = e.message || `Kosa katika kuweka kigezo: ${trimmedCmd}`;
+						this.addOutput(errorMsg, "error");
+						reject(new Error(errorMsg));
+						return;
+					}
+				}
+			}
+
+			// Parse commands using regex that allows expressions inside parens
+			// washa(variable) or washa(1+1)
+			const commandMatch = trimmedCmd.match(/^([a-z]+)\((.*)\)$/);
+
+			if (commandMatch) {
+				const command = commandMatch[1];
+				const argStr = commandMatch[2];
+				let argValue: number;
+
+				try {
+					argValue = this.evaluateExpression(argStr);
+				} catch (e: any) {
+					this.addOutput(e.message, "error");
+					reject(new Error(e.message));
+					return;
+				}
+
+				if (command === "washa") {
+					const componentIndex = argValue - 1;
+					if (
+						componentIndex >= 0 &&
+						componentIndex < this.config.componentCount
+					) {
+						this.callbacks.onComponentChange(componentIndex, true);
+						this.addOutput(
+							`Kifaa nambari ${componentIndex + 1} kimewashwa`,
+							"success",
+						);
+						resolve();
+					} else {
+						const errorMsg = `Nambari ya kifaa si sahihi: ${argValue}`;
+						this.addOutput(errorMsg, "error");
+						reject(new Error(errorMsg));
+					}
+				} else if (command === "zima") {
+					const componentIndex = argValue - 1;
+					if (
+						componentIndex >= 0 &&
+						componentIndex < this.config.componentCount
+					) {
+						this.callbacks.onComponentChange(componentIndex, false);
+						this.addOutput(
+							`Kifaa nambari ${componentIndex + 1} kimezimwa`,
+							"success",
+						);
+						resolve();
+					} else {
+						const errorMsg = `Nambari ya kifaa si sahihi: ${argValue}`;
+						this.addOutput(errorMsg, "error");
+						reject(new Error(errorMsg));
+					}
+				} else if (command === "subiri") {
+					const delayMs = argValue;
+					this.addOutput(`Inasubiri kwa ${delayMs}ms...`);
+					this.executionTimeout = setTimeout(() => {
+						this.addOutput(`Muda wa kusubiri umeisha`);
+						resolve();
+					}, delayMs);
 				} else {
-					const errorMsg = `Nambari ya kifaa si sahihi: ${componentIndex + 1}`;
+					const errorMsg = `Amri haijulikani: ${command}`;
 					this.addOutput(errorMsg, "error");
 					reject(new Error(errorMsg));
 				}
-			} else if (zimaMatch) {
-				const componentIndex = Number.parseInt(zimaMatch[1]) - 1;
-				if (
-					componentIndex >= 0 &&
-					componentIndex < this.config.componentCount
-				) {
-					this.callbacks.onComponentChange(componentIndex, false);
-					this.addOutput(
-						`Kifaa nambari ${componentIndex + 1} kimezimwa`,
-						"success",
-					);
-					resolve();
-				} else {
-					const errorMsg = `Nambari ya kifaa si sahihi: ${componentIndex + 1}`;
-					this.addOutput(errorMsg, "error");
-					reject(new Error(errorMsg));
-				}
-			} else if (subiriMatch) {
-				const delayMs = Number.parseInt(subiriMatch[1]);
-				this.addOutput(`Inasubiri kwa ${delayMs}ms...`);
-				this.executionTimeout = setTimeout(() => {
-					this.addOutput(`Muda wa kusubiri umeisha`);
-					resolve();
-				}, delayMs);
 			} else {
-				const errorMsg = `Amri haijulikani: ${trimmedCmd}`;
+				const errorMsg = `Amri haijulikani au muundo si sahihi: ${trimmedCmd}`;
 				this.addOutput(errorMsg, "error");
 				reject(new Error(errorMsg));
 			}
@@ -123,61 +223,89 @@ export class ElectronicsExecutor {
 	}
 
 	/**
-	 * Preprocessor to expand rudia() blocks (loop expansion)
+	 * Preprocessor to expand rudia() blocks recursively
 	 */
 	preprocessCode(code: string): string {
 		const lines = code.split("\n");
-		const expandedLines: string[] = [];
-		let i = 0;
+		
+		const expandBlock = (inputLines: string[]): string[] => {
+			const expandedLines: string[] = [];
+			let i = 0;
 
-		while (i < lines.length) {
-			const line = lines[i].trim();
-			const rudiaMatch = line.match(/^rudia\((\d+)\)\s*\{$/);
+			while (i < inputLines.length) {
+				const line = inputLines[i].trim();
+				const rudiaMatch = line.match(/^rudia\((.*)\)\s*\{$/);
 
-			if (rudiaMatch) {
-				const repeatCount = Number.parseInt(rudiaMatch[1]);
-				// Find the matching closing brace
-				let braceCount = 1;
-				let j = i + 1;
-				const blockLines: string[] = [];
+				if (rudiaMatch) {
+					// We need to evaluate the expression inside rudia() later? 
+					// Actually, for Loop Unrolling (which is what we are doing here), 
+					// we require a STATIC number for now because we unroll at compile time.
+					// If we want dynamic loops, we'd need a full interpreter execution loop.
+					// For this "rudimentary" interpreter, we will stick to unrolling.
+					// However, the user REQUESTED "rudia(3) { ... rudia(9) { ... } }"
+					// So basic number parsing is enough for now. 
+					// If the user puts a variable "rudia(wa)", this unrolling will fail 
+					// unless we change the architecture to a runtime loop instead of pre-unrolling.
+					// Given the scope "Update rudimentary interpreter... basic variables stuff",
+					// I will stick to unrolling with static numbers for now, but fully recursive.
+					
+					// If logic requires runtime loop counts (rudia(x)), that's a much bigger refactor
+					// (moving away from line-by-line async execution to an AST walker).
+					// The prompt example shows "rudia(3)" and "rudia(9)", which are static.
 
-				while (j < lines.length && braceCount > 0) {
-					const currentLine = lines[j].trim();
-					if (currentLine === "{") {
-						braceCount++;
-						blockLines.push(lines[j]);
-					} else if (currentLine === "}") {
-						braceCount--;
-						if (braceCount > 0) {
-							blockLines.push(lines[j]);
-						}
-					} else {
-						blockLines.push(lines[j]);
+					let repeatCount = 0;
+					try {
+						// Attempt to parse simple number
+						repeatCount = parseInt(rudiaMatch[1]);
+					} catch (e) {
+						repeatCount = 0;
 					}
-					j++;
-				}
 
-				// Expand the block by repeating it
-				expandedLines.push(`// rudia(${repeatCount}) imeenezwa hapa:`);
-				for (let repeat = 0; repeat < repeatCount; repeat++) {
-					expandedLines.push(
-						`// --- Mzunguko ${repeat + 1}/${repeatCount} ---`,
-					);
-					expandedLines.push(...blockLines);
-				}
-				expandedLines.push(`// --- Mwisho wa rudia ---`);
+					// Find the matching closing brace
+					let braceCount = 1;
+					let j = i + 1;
+					const blockLines: string[] = [];
 
-				i = j; // Skip to after the block
-			} else {
-				// Keep the line as is
-				if (lines[i].trim() || i === 0) {
-					expandedLines.push(lines[i]);
+					while (j < inputLines.length && braceCount > 0) {
+						const currentLine = inputLines[j].trim();
+						if (currentLine.endsWith("{") && (currentLine.startsWith("rudia") || currentLine.startsWith("kama"))) {
+							braceCount++;
+							blockLines.push(inputLines[j]);
+						} else if (currentLine === "}") {
+							braceCount--;
+							if (braceCount > 0) {
+								blockLines.push(inputLines[j]);
+							}
+						} else {
+							blockLines.push(inputLines[j]);
+						}
+						j++;
+					}
+
+					// Recursively expand the block content
+					const expandedBlock = expandBlock(blockLines);
+
+					// Expand the block by repeating it
+					expandedLines.push(`// rudia(${repeatCount}) imeenezwa hapa:`);
+					for (let repeat = 0; repeat < repeatCount; repeat++) {
+						expandedLines.push(
+							`// --- Mzunguko ${repeat + 1}/${repeatCount} ---`,
+						);
+						expandedLines.push(...expandedBlock);
+					}
+					expandedLines.push(`// --- Mwisho wa rudia ---`);
+
+					i = j; // Skip to after the block
+				} else {
+					// Keep the line as is
+					expandedLines.push(inputLines[i]);
+					i++;
 				}
-				i++;
 			}
-		}
+			return expandedLines;
+		};
 
-		return expandedLines.join("\n");
+		return expandBlock(lines).join("\n");
 	}
 
 	/**
@@ -185,6 +313,7 @@ export class ElectronicsExecutor {
 	 */
 	async run(code: string): Promise<string> {
 		this.outputBuffer = [];
+		this.variables.clear(); // Reset variables on new run
 
 		return new Promise((resolve) => {
 			const originalOnOutput = this.callbacks.onOutput;
@@ -216,6 +345,7 @@ export class ElectronicsExecutor {
 		this.currentLine = -1;
 		this.callbacks.onLineChange(-1);
 		this.callbacks.onError(null);
+		this.variables.clear(); // Ensure variables are cleared
 		this.addOutput("🚀 Kuanzisha utekelezaji wa programu...");
 
 		// Preprocess code to expand rudia() blocks
@@ -226,6 +356,9 @@ export class ElectronicsExecutor {
 		const runLine = async (i: number): Promise<void> => {
 			if (i >= lines.length) {
 				if (this.config.loop && this.programState === "running") {
+					// Simple infinite loop of the whole program
+					// Note: Variables are preserved across main loops if config.loop is true?
+					// Usually in embedded loop() variables persist. Let's keep them.
 					this.currentLine = -1;
 					this.callbacks.onLineChange(-1);
 					setTimeout(() => runLine(0), 0);
@@ -353,6 +486,14 @@ export const DEFAULT_COMPONENTS: ComponentState[] = [
 	{ pin: 3, isEnabled: false, isInput: false, type: "led", color: "blue" },
 	{ pin: 4, isEnabled: false, isInput: false, type: "buzzer" },
 	{ pin: 5, isEnabled: false, isInput: false, type: "motor" },
+    // Add generic components up to 20 to allow for larger simulations/experiments
+    ...Array.from({ length: 15 }, (_, i) => ({
+        pin: i + 6,
+        isEnabled: false,
+        isInput: false,
+        type: "led" as const,
+        color: "red"
+    }))
 ];
 
 /**

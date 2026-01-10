@@ -12,6 +12,7 @@ export interface RendererConfig {
 		}
 	>;
 	initialCameraPosition?: [number, number, number];
+	disable2D?: boolean;
 }
 
 export interface SimulationDef {
@@ -24,7 +25,7 @@ export interface SimulationDef {
 	rendererConfig: RendererConfig;
 }
 
-const DEFAULT_MODEL = "/models/Arduino-nuru.glb";
+const DEFAULT_MODEL = "/models/Arduino-full.glb";
 
 export const SIMULATIONS: SimulationDef[] = [
 	{
@@ -54,24 +55,11 @@ export const SIMULATIONS: SimulationDef[] = [
 		],
 		edges: [],
 		rendererConfig: {
-			modelPath: DEFAULT_MODEL,
+			modelPath: "/models/Arduino-three-LEDs.glb",
 			mappings: {
 				RED: { type: "LED", pin: 1, colorHex: 0xff0000, offColorHex: 0x440000 },
-				YELLOW: { type: "LED", pin: 2, colorHex: 0xffff00, offColorHex: 0x444400 }, // Assuming model has YELLOW or we re-color GREEN? The code previously used GREEN for pin 2? No, wait.
-                // Previous code: RED: 1, GREEN: 2, BLUE: 3.
-                // Traffic light usually needs R, Y, G.
-                // Let's check the previous LED_CONFIG: RED, GREEN, BLUE.
-                // It seems the model might only have RGB. 
-                // For traffic lights, we might need to be creative. 
-                // If the model *only* has RED, GREEN, BLUE meshes, we can't make a YELLOW one appear unless we recolor one of them.
-                // Let's assume we use GREEN as Yellow for now, or maybe the model has a YELLOW mesh? 
-                // The user said "use specific simulations".
-                // Let's map RED->1, GREEN->2 (Yellowish?), BLUE->3 (Green?). 
-                // Wait, typically traffic lights are R, Y, G. 
-                // Let's Map: RED -> 1 (Red), GREEN -> 2 (Yellow - by overriding color?), BLUE -> 3 (Green).
-                // I will try to override the color in the config.
-				GREEN: { type: "LED", pin: 2, colorHex: 0xffff00, offColorHex: 0x333300 }, // Re-purposing Green mesh as Yellow
-				BLUE: { type: "LED", pin: 3, colorHex: 0x00ff00, offColorHex: 0x003300 }, // Re-purposing Blue mesh as Green
+				GREEN: { type: "LED", pin: 2, colorHex: 0xffff00, offColorHex: 0x333300 }, // Using Green mesh as Yellow
+				BLUE: { type: "LED", pin: 3, colorHex: 0x00ff00, offColorHex: 0x003300 }, // Using Blue mesh as Green
 			},
 		},
 	},
@@ -90,7 +78,7 @@ export const SIMULATIONS: SimulationDef[] = [
 		],
 		edges: [],
 		rendererConfig: {
-			modelPath: DEFAULT_MODEL,
+			modelPath: "/models/arduino-single-led.glb",
 			mappings: {
 				RED: { type: "LED", pin: 1, colorHex: 0xff0000, offColorHex: 0x440000 },
 			},
@@ -149,6 +137,133 @@ export const SIMULATIONS: SimulationDef[] = [
 				RED: { type: "LED", pin: 1, colorHex: 0xff0000, offColorHex: 0x440000 },
 				BLUE: { type: "LED", pin: 2, colorHex: 0x0000ff, offColorHex: 0x000033 },
 				BUZZER: { type: "BUZZER", pin: 3 },
+			},
+		},
+	},
+	{
+		id: "push-button",
+		name: "Batanikizo",
+		description: "Mfano wa batanikizo (Push Button) na LED.",
+		keywords: ["button", "push", "batanikizo", "led", "switch"],
+		nodes: [
+			{
+				id: "1",
+				type: "led",
+				position: { x: 100, y: 100 },
+				data: { isEnabled: false, color: "red", pin: 7, label: "LED" },
+			},
+            // Note: Button input handling in Nuru might be limited, but the simulation visualizes it
+		],
+		edges: [],
+		rendererConfig: {
+			modelPath: "/models/arduino-pushbutton.glb",
+			mappings: {
+				LED: { type: "LED", pin: 7, colorHex: 0xff0000, offColorHex: 0x440000 },
+                // BUTTON mapping might be needed if visual feedback from code is possible, or just for the internal logic of the scene
+			},
+            disable2D: true, // Button component doesn't exist in 2D yet
+            initialCameraPosition: [12, 8, 12]
+		},
+	},
+    {
+		id: "four-led-buzzer",
+		name: "4 LEDs & Buzzer",
+		description: "Taa nne na kengele (Buzzer) kwa ajili ya mifumo ya alarm.",
+		keywords: ["led", "buzzer", "alarm", "kengele", "nne"],
+		nodes: [
+			{ id: "1", type: "led", position: { x: 50, y: 50 }, data: { isEnabled: false, color: "red", pin: 1, label: "RED" } },
+            { id: "2", type: "led", position: { x: 150, y: 50 }, data: { isEnabled: false, color: "red", pin: 2, label: "RED1" } },
+            { id: "3", type: "led", position: { x: 250, y: 50 }, data: { isEnabled: false, color: "red", pin: 3, label: "RED2" } },
+            { id: "4", type: "led", position: { x: 350, y: 50 }, data: { isEnabled: false, color: "red", pin: 4, label: "RED3" } },
+            { id: "5", type: "buzzer", position: { x: 200, y: 150 }, data: { isEnabled: false, pin: 5, label: "BUZZER" } },
+		],
+		edges: [],
+		rendererConfig: {
+			modelPath: "/models/4LEDBuzzer.glb",
+			mappings: {
+				RED: { type: "LED", pin: 1, colorHex: 0xff0000, offColorHex: 0x440000 },
+                RED1: { type: "LED", pin: 2, colorHex: 0xff0000, offColorHex: 0x440000 },
+                RED2: { type: "LED", pin: 3, colorHex: 0xff0000, offColorHex: 0x440000 },
+                RED3: { type: "LED", pin: 4, colorHex: 0xff0000, offColorHex: 0x440000 },
+                BUZZER: { type: "BUZZER", pin: 5 }
+			},
+            disable2D: false
+		},
+	},
+    {
+		id: "nine-led",
+		name: "9 LEDs Display",
+		description: "Onyesho la taa tisa (9) za rangi mbalimbali.",
+		keywords: ["led", "display", "matrix", "tisa", "nying", "rangi"],
+		nodes: Array.from({ length: 9 }, (_, i) => ({
+            id: `${i + 1}`,
+            type: "led",
+            position: { x: 50 + (i % 3) * 100, y: 50 + Math.floor(i / 3) * 100 },
+            data: { 
+                isEnabled: false, 
+                color: i < 3 ? "red" : i < 6 ? "yellow" : "green", 
+                pin: i + 1,
+                label: i < 3 ? `RED${i+1}` : i < 6 ? `YELLOW${i-2}` : `GREEN${i-5}`
+            },
+        })),
+		edges: [],
+		rendererConfig: {
+			modelPath: "/models/9LED.glb",
+			mappings: {
+				RED1: { type: "LED", pin: 1, colorHex: 0xff0000, offColorHex: 0x440000 },
+                RED2: { type: "LED", pin: 2, colorHex: 0xff0000, offColorHex: 0x440000 },
+                RED3: { type: "LED", pin: 3, colorHex: 0xff0000, offColorHex: 0x440000 },
+                YELLOW1: { type: "LED", pin: 4, colorHex: 0xffdd00, offColorHex: 0x443300 },
+                YELLOW2: { type: "LED", pin: 5, colorHex: 0xffdd00, offColorHex: 0x443300 },
+                YELLOW3: { type: "LED", pin: 6, colorHex: 0xffdd00, offColorHex: 0x443300 },
+                GREEN1: { type: "LED", pin: 7, colorHex: 0x00ff44, offColorHex: 0x004411 },
+                GREEN2: { type: "LED", pin: 8, colorHex: 0x00ff44, offColorHex: 0x004411 },
+                GREEN3: { type: "LED", pin: 9, colorHex: 0x00ff44, offColorHex: 0x004411 },
+			},
+		},
+	},
+    {
+		id: "vu-meter",
+		name: "VU Meter",
+		description: "Kipimo cha sauti (VU Meter) kwa kutumia LEDs.",
+		keywords: ["vu", "meter", "sound", "sauti", "level"],
+		nodes: [
+            { id: "1", type: "led", position: { x: 50, y: 50 }, data: { isEnabled: false, color: "white", pin: 1, label: "WHITE" } },
+            { id: "2", type: "led", position: { x: 50, y: 150 }, data: { isEnabled: false, color: "yellow", pin: 2, label: "YELLOW" } },
+            { id: "3", type: "led", position: { x: 50, y: 250 }, data: { isEnabled: false, color: "green", pin: 3, label: "GREEN" } },
+            { id: "4", type: "led", position: { x: 50, y: 350 }, data: { isEnabled: false, color: "blue", pin: 4, label: "BLUE" } },
+            { id: "5", type: "led", position: { x: 50, y: 450 }, data: { isEnabled: false, color: "red", pin: 5, label: "RED" } },
+        ],
+		edges: [],
+		rendererConfig: {
+			modelPath: "/models/vu-meter.glb",
+			mappings: {
+				WHITE: { type: "LED", pin: 1, colorHex: 0xffffff, offColorHex: 0x444444 },
+                YELLOW: { type: "LED", pin: 2, colorHex: 0xffdd00, offColorHex: 0x443300 },
+                GREEN: { type: "LED", pin: 3, colorHex: 0x00ff44, offColorHex: 0x004411 },
+                BLUE: { type: "LED", pin: 4, colorHex: 0x0088ff, offColorHex: 0x002244 },
+                RED: { type: "LED", pin: 5, colorHex: 0xff0000, offColorHex: 0x440000 },
+			},
+		},
+	},
+    {
+		id: "simple-led",
+		name: "Taa Moja (Single LED)",
+		description: "Mfano rahisi wa taa moja ya LED.",
+		keywords: ["led", "single", "moja", "taa"],
+		nodes: [
+			{
+				id: "1",
+				type: "led",
+				position: { x: 100, y: 100 },
+				data: { isEnabled: false, color: "red", pin: 7, label: "LED" },
+			},
+		],
+		edges: [],
+		rendererConfig: {
+			modelPath: "/models/arduino-led.glb",
+			mappings: {
+				LED: { type: "LED", pin: 7, colorHex: 0xff0000, offColorHex: 0x440000 },
 			},
 		},
 	},

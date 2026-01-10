@@ -186,14 +186,22 @@ function useMotorAudio(isEnabled: boolean) {
 	}, [isEnabled]);
 }
 
+interface ArduinoModelProps {
+	nodes: Node[];
+	config?: RendererConfig;
+    buttonPressed: boolean;
+    onButtonDown: () => void;
+    onButtonUp: () => void;
+}
+
 function ArduinoModel({
 	nodes,
 	config,
-}: {
-	nodes: Node[];
-	config?: RendererConfig;
-}) {
-	const modelPath = config?.modelPath || "/models/Arduino-nuru.glb";
+    buttonPressed,
+    onButtonDown,
+    onButtonUp,
+}: ArduinoModelProps) {
+	const modelPath = config?.modelPath || "/models/Arduino-full.glb";
 
 	const dracoLoader = useMemo(() => {
 		const loader = new DRACOLoader();
@@ -210,6 +218,9 @@ function ArduinoModel({
 
 	const clonedScene = useMemo(() => gltf.scene.clone(), [gltf.scene]);
 	const shaftRef = useRef<THREE.Object3D | null>(null);
+    const buttonRef = useRef<THREE.Object3D | null>(null);
+    const buttonRestZ = useRef<number>(0);
+    const currentZ = useRef<number>(0);
 
 	// Derive audio states from mappings
 	const mappings = config?.mappings || {};
@@ -239,6 +250,13 @@ function ArduinoModel({
 			if (child.name.toUpperCase() === "SHAFT") {
 				shaftRef.current = child;
 			}
+            
+            // Find button for push button simulation
+            if (child.name === "BUTTON") {
+                buttonRef.current = child;
+                buttonRestZ.current = child.position.z;
+                currentZ.current = child.position.z;
+            }
 		});
 	}, [clonedScene]);
 
@@ -246,6 +264,20 @@ function ArduinoModel({
 		if (shaftRef.current && motorOn) {
 			shaftRef.current.rotation.z += delta * 15;
 		}
+
+        // Button Animation
+        if (buttonRef.current) {
+            const targetZ = buttonPressed
+                ? buttonRestZ.current - 0.0015
+                : buttonRestZ.current;
+
+            currentZ.current = THREE.MathUtils.lerp(
+                currentZ.current,
+                targetZ,
+                1 - Math.pow(0.001, delta),
+            );
+            buttonRef.current.position.z = currentZ.current;
+        }
 	});
 
 	useEffect(() => {
@@ -268,7 +300,12 @@ function ArduinoModel({
 
 				if (mapping && mapping.type === "LED") {
 					const pin = mapping.pin;
-					const isOn = getIsEnabled(pin);
+					// Logic: LED is on if code enables it OR if button is pressed (for push button sim)
+                    // We assume if disable2D is true and button is valid, it's the push button sim
+                    // A more robust check might be needed if button controls are more generic
+                    const isCodeEnabled = getIsEnabled(pin);
+                    const isButtonEnabled = buttonPressed && !!buttonRef.current; 
+					const isOn = isCodeEnabled || isButtonEnabled;
 
                     // Use colors from config or defaults
                     const onColor = mapping.colorHex ?? 0xff0000;
@@ -288,11 +325,32 @@ function ArduinoModel({
 				}
 			}
 		});
-	}, [clonedScene, nodes, mappings]);
+	}, [clonedScene, nodes, mappings, buttonPressed]);
 
 	return (
 		<Center>
-			<primitive object={clonedScene} scale={200} />
+			<primitive 
+                object={clonedScene} 
+                scale={200}
+                onPointerDown={(e: any) => {
+                    const obj = e.object;
+                     if (
+                        obj.name === "BUTTON" ||
+                        obj.parent?.name === "BUTTON" ||
+                        obj.parent?.name === "Botao"
+                      ) {
+                        e.stopPropagation();
+                        onButtonDown();
+                      }
+                }}
+                onPointerUp={(e: any) => {
+                    e.stopPropagation();
+                    onButtonUp();
+                }}
+                onPointerLeave={() => {
+                    onButtonUp();
+                }}
+            />
 		</Center>
 	);
 }
@@ -302,18 +360,24 @@ function Scene({
 	config,
 	controlsRef,
 	onZoomChange,
+    buttonPressed,
+    onButtonDown,
+    onButtonUp
 }: {
 	nodes: Node[];
     config?: RendererConfig;
 	controlsRef: React.RefObject<OrbitControlsType | null>;
 	onZoomChange: (scale: number) => void;
+    buttonPressed: boolean;
+    onButtonDown: () => void;
+    onButtonUp: () => void;
 }) {
 	// Bloom only for active LEDs
     // Check if any mapped LED is enabled
     const mappings = config?.mappings || {};
     const anyLedOn = Object.values(mappings).some(m => 
         m.type === "LED" && nodes.find(n => n.data?.pin === m.pin)?.data?.isEnabled
-    );
+    ) || buttonPressed; // Also bloom if button pressed
 
 	return (
 		<>
@@ -324,7 +388,13 @@ function Scene({
 			<directionalLight position={[10, 10, 5]} intensity={0.5} />
 			<ZoomTracker controlsRef={controlsRef} onZoomChange={onZoomChange} />
 			<Suspense fallback={<SceneLoader />}>
-				<ArduinoModel nodes={nodes} config={config} />
+				<ArduinoModel 
+                    nodes={nodes} 
+                    config={config} 
+                    buttonPressed={buttonPressed}
+                    onButtonDown={onButtonDown}
+                    onButtonUp={onButtonUp}
+                />
 			</Suspense>
 			<EffectComposer>
 				<Bloom
@@ -346,7 +416,19 @@ export function SimulationPanel3D({
 	const controlsRef = useRef<OrbitControlsType>(null);
 	const cameraRef = useRef<THREE.PerspectiveCamera>(null);
 	const [zoomScale, setZoomScale] = useState(1);
+    const [buttonPressed, setButtonPressed] = useState(false);
     
+     // handle mouse release outside the canvas
+      useEffect(() => {
+        const handleGlobalMouseUp = () => setButtonPressed(false);
+        window.addEventListener("mouseup", handleGlobalMouseUp);
+        window.addEventListener("touchend", handleGlobalMouseUp);
+        return () => {
+          window.removeEventListener("mouseup", handleGlobalMouseUp);
+          window.removeEventListener("touchend", handleGlobalMouseUp);
+        };
+      }, []);
+
     // Default camera position
 	const initialCamera = { position: config?.initialCameraPosition || [12, 8, 12], fov: 45 };
 
@@ -421,6 +503,9 @@ export function SimulationPanel3D({
 					config={config}
 					controlsRef={controlsRef}
 					onZoomChange={setZoomScale}
+                    buttonPressed={buttonPressed}
+                    onButtonDown={() => setButtonPressed(true)}
+                    onButtonUp={() => setButtonPressed(false)}
 				/>
 				<OrbitControls
 					ref={controlsRef}
@@ -469,13 +554,15 @@ export function SimulationPanel3D({
 						<path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
 					</svg>
 				</button>
-				<button
-					onClick={onToggleView}
-					className="flex h-[27px] w-[27px] items-center justify-center text-xs font-medium text-slate-300 hover:bg-slate-700"
-					title="2D view"
-				>
-					2D
-				</button>
+				{!config?.disable2D && (
+					<button
+						onClick={onToggleView}
+						className="flex h-[27px] w-[27px] items-center justify-center text-xs font-medium text-slate-300 hover:bg-slate-700"
+						title="2D view"
+					>
+						2D
+					</button>
+				)}
 			</div>
 		</div>
 	);

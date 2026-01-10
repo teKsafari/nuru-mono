@@ -32,9 +32,9 @@ export function SimulationPanel({
 	content,
 	config,
 }: SimulationPanelProps) {
-	const [is3D, setIs3D] = useState(false);
+	const [is3D, setIs3D] = useState(config?.disable2D || false);
 
-	if (is3D) {
+	if (is3D || config?.disable2D) {
 		return (
 			<SimulationPanel3D
 				nodes={nodes}
