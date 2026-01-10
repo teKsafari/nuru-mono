@@ -9,26 +9,13 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import type { OrbitControls as OrbitControlsType } from "three-stdlib";
 import type { Node } from "@xyflow/react";
+import type { RendererConfig } from "@/lib/simulations";
 
 interface SimulationPanel3DProps {
 	nodes: Node[];
 	onToggleView: () => void;
-	modelPath?: string;
+	config?: RendererConfig;
 }
-
-const LED_CONFIG = {
-	RED: { color: 0xff0000, offColor: 0x440000 },
-	GREEN: { color: 0x22c55e, offColor: 0x0a3d1f },
-	BLUE: { color: 0x3b82f6, offColor: 0x0f1e3d },
-} as const;
-
-const COMPONENT_PINS: Record<string, number> = {
-	RED: 1,
-	GREEN: 2,
-	BLUE: 3,
-	BUZZER: 4,
-	SHAFT: 5,
-};
 
 function ZoomTracker({
 	controlsRef,
@@ -70,6 +57,9 @@ function useBuzzerAudio(isEnabled: boolean) {
 	const gainNodeRef = useRef<GainNode | null>(null);
 
 	useEffect(() => {
+		// Only run in browser
+		if (typeof window === "undefined") return;
+
 		if (!audioContextRef.current) {
 			try {
 				audioContextRef.current = new (
@@ -132,6 +122,9 @@ function useMotorAudio(isEnabled: boolean) {
 	const fadeIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
 	useEffect(() => {
+		// Only run in browser
+		if (typeof window === "undefined") return;
+
 		const fadeDuration = 300; // ms
 		const fadeSteps = 15;
 		const stepTime = fadeDuration / fadeSteps;
@@ -195,11 +188,13 @@ function useMotorAudio(isEnabled: boolean) {
 
 function ArduinoModel({
 	nodes,
-	modelPath,
+	config,
 }: {
 	nodes: Node[];
-	modelPath: string;
+	config?: RendererConfig;
 }) {
+	const modelPath = config?.modelPath || "/models/Arduino-nuru.glb";
+
 	const dracoLoader = useMemo(() => {
 		const loader = new DRACOLoader();
 		loader.setDecoderPath(
@@ -216,16 +211,31 @@ function ArduinoModel({
 	const clonedScene = useMemo(() => gltf.scene.clone(), [gltf.scene]);
 	const shaftRef = useRef<THREE.Object3D | null>(null);
 
-	const motorOn =
-		nodes.find((n) => n.data?.pin === 5)?.data?.isEnabled ?? false;
-	const buzzerOn =
-		nodes.find((n) => n.data?.pin === 4)?.data?.isEnabled ?? false;
+	// Derive audio states from mappings
+	const mappings = config?.mappings || {};
+	
+	const motorOn = useMemo(() => {
+		// Find any mapping of type MOTOR that corresponds to an enabled pin
+		return Object.values(mappings).some(m => 
+			m.type === "MOTOR" && nodes.find(n => n.data?.pin === m.pin)?.data?.isEnabled
+		);
+	}, [mappings, nodes]);
+
+	const buzzerOn = useMemo(() => {
+		return Object.values(mappings).some(m => 
+			m.type === "BUZZER" && nodes.find(n => n.data?.pin === m.pin)?.data?.isEnabled
+		);
+	}, [mappings, nodes]);
+
 
 	useBuzzerAudio(buzzerOn);
 	useMotorAudio(motorOn);
 
 	useEffect(() => {
 		clonedScene.traverse((child) => {
+			// Find shaft if any motor mapping uses it
+            // Assuming SHAFT is the name for motor part in the model
+            // If mapping key is SHAFT, we treat it as such.
 			if (child.name.toUpperCase() === "SHAFT") {
 				shaftRef.current = child;
 			}
@@ -242,14 +252,27 @@ function ArduinoModel({
 		const getIsEnabled = (pin: number) =>
 			nodes.find((n) => n.data?.pin === pin)?.data?.isEnabled ?? false;
 
+        // Known controllable components that should be hidden if not used
+        const KNOWN_COMPONENTS = ["RED", "GREEN", "BLUE", "BUZZER", "SHAFT"];
+
 		clonedScene.traverse((child) => {
 			if (child instanceof THREE.Mesh) {
 				const nodeName = child.name.toUpperCase();
+                
+                // Visibility check: Hide known components if not in mappings
+                if (KNOWN_COMPONENTS.includes(nodeName)) {
+                    child.visible = !!mappings[nodeName];
+                }
 
-				if (nodeName in LED_CONFIG) {
-					const config = LED_CONFIG[nodeName as keyof typeof LED_CONFIG];
-					const pin = COMPONENT_PINS[nodeName];
+                const mapping = mappings[nodeName];
+
+				if (mapping && mapping.type === "LED") {
+					const pin = mapping.pin;
 					const isOn = getIsEnabled(pin);
+
+                    // Use colors from config or defaults
+                    const onColor = mapping.colorHex ?? 0xff0000;
+                    const offColor = mapping.offColorHex ?? 0x440000;
 
 					if (!child.userData.materialCloned) {
 						child.material = (child.material as THREE.Material).clone();
@@ -257,15 +280,15 @@ function ArduinoModel({
 					}
 
 					const mat = child.material as THREE.MeshStandardMaterial;
-					mat.color.setHex(isOn ? config.color : config.offColor);
-					mat.emissive.setHex(config.color);
+					mat.color.setHex(isOn ? onColor : offColor);
+					mat.emissive.setHex(onColor);
 					mat.emissiveIntensity = isOn ? 5 : 0;
 					mat.roughness = isOn ? 0.2 : 0.6;
 					mat.toneMapped = false;
 				}
 			}
 		});
-	}, [clonedScene, nodes]);
+	}, [clonedScene, nodes, mappings]);
 
 	return (
 		<Center>
@@ -276,19 +299,21 @@ function ArduinoModel({
 
 function Scene({
 	nodes,
-	modelPath,
+	config,
 	controlsRef,
 	onZoomChange,
 }: {
 	nodes: Node[];
-	modelPath: string;
+    config?: RendererConfig;
 	controlsRef: React.RefObject<OrbitControlsType | null>;
 	onZoomChange: (scale: number) => void;
 }) {
-	// Bloom only for LEDs (pins 1-3), not buzzer/motor
-	const anyLedOn = [1, 2, 3].some(
-		(pin) => nodes.find((n) => n.data?.pin === pin)?.data?.isEnabled,
-	);
+	// Bloom only for active LEDs
+    // Check if any mapped LED is enabled
+    const mappings = config?.mappings || {};
+    const anyLedOn = Object.values(mappings).some(m => 
+        m.type === "LED" && nodes.find(n => n.data?.pin === m.pin)?.data?.isEnabled
+    );
 
 	return (
 		<>
@@ -299,7 +324,7 @@ function Scene({
 			<directionalLight position={[10, 10, 5]} intensity={0.5} />
 			<ZoomTracker controlsRef={controlsRef} onZoomChange={onZoomChange} />
 			<Suspense fallback={<SceneLoader />}>
-				<ArduinoModel nodes={nodes} modelPath={modelPath} />
+				<ArduinoModel nodes={nodes} config={config} />
 			</Suspense>
 			<EffectComposer>
 				<Bloom
@@ -316,12 +341,14 @@ function Scene({
 export function SimulationPanel3D({
 	nodes,
 	onToggleView,
-	modelPath = "/models/Arduino-nuru.glb",
+    config,
 }: SimulationPanel3DProps) {
 	const controlsRef = useRef<OrbitControlsType>(null);
 	const cameraRef = useRef<THREE.PerspectiveCamera>(null);
 	const [zoomScale, setZoomScale] = useState(1);
-	const initialCamera = { position: [12, 8, 12] as const, fov: 45 };
+    
+    // Default camera position
+	const initialCamera = { position: config?.initialCameraPosition || [12, 8, 12], fov: 45 };
 
 	const handleZoomIn = () => {
 		if (controlsRef.current) {
@@ -357,6 +384,7 @@ export function SimulationPanel3D({
 
 	const handleFitView = () => {
 		if (controlsRef.current && cameraRef.current) {
+            // @ts-ignore
 			cameraRef.current.position.set(...initialCamera.position);
 			controlsRef.current.target.set(0, 0, 0);
 			controlsRef.current.update();
@@ -381,6 +409,7 @@ export function SimulationPanel3D({
 			}}
 		>
 			<Canvas
+                // @ts-ignore
 				camera={{ position: initialCamera.position, fov: initialCamera.fov }}
 				gl={{ antialias: true, alpha: true }}
 				onCreated={({ camera }) => {
@@ -389,7 +418,7 @@ export function SimulationPanel3D({
 			>
 				<Scene
 					nodes={nodes}
-					modelPath={modelPath}
+					config={config}
 					controlsRef={controlsRef}
 					onZoomChange={setZoomScale}
 				/>
@@ -451,3 +480,4 @@ export function SimulationPanel3D({
 		</div>
 	);
 }
+

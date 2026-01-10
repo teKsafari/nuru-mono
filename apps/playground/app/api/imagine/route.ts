@@ -46,12 +46,16 @@ available_simulations: ${JSON.stringify(
 		)}
 
 Nuru Language Reference:
-- \`washa(pin)\`: Turn on LED/device at pin.
-- \`zima(pin)\`: Turn off LED/device at pin.
+- \`washa(pin)\`: Turn on LED/device at pin. Argument \`pin\` MUST be an integer (e.g., \`washa(1)\`), NOT a string.
+- \`zima(pin)\`: Turn off LED/device at pin. Argument \`pin\` MUST be an integer (e.g., \`zima(1)\`), NOT a string.
 - \`subiri(ms)\`: Wait for milliseconds.
 - \`rudia(n) { ... }\`: Repeat n times.
 - \`andika(text)\`: Print text.
 - Variables are defined without keywords (e.g., \`x = 10\`).
+
+IMPORTANT: 
+- Always use NUMBERS for pin arguments, never strings like "RED" or "1". Example: \`washa(1)\` is correct, \`washa("RED")\` is WRONG.
+- DO NOT include comments in the code (lines starting with //). The code should be clean.
 
 Output format: JSON object with the following structure:
 {

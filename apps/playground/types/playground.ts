@@ -30,4 +30,5 @@ export interface PlaygroundProps {
 	edges?: Edge[];
 	onNodesChange?: OnNodesChange;
 	nodeTypes?: NodeTypes;
+	rendererConfig?: any; // Avoiding circular dependency, or I should move the type definition here
 }

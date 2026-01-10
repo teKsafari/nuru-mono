@@ -122,6 +122,7 @@ export default function WaziaPage() {
 			nodes={nodes}
 			onNodesChange={onNodesChange}
 			nodeTypes={nodeTypes}
+			rendererConfig={SIMULATIONS.find(s => s.id === (typeof window !== "undefined" ? JSON.parse(localStorage.getItem("wazia_result") || "{}").simulationId : null))?.rendererConfig}
 		/>
 	);
 }

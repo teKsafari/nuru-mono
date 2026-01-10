@@ -21,6 +21,7 @@ export function Playground({
 	edges = [],
 	onNodesChange,
 	nodeTypes,
+	rendererConfig,
 }: PlaygroundProps) {
 	const isMobile = useIsMobile();
 	const [activeTab, setActiveTab] = useState<"lesson" | "code" | "simulation">(
@@ -83,6 +84,7 @@ export function Playground({
 							onNodesChange={onNodesChange}
 							nodeTypes={nodeTypes}
 							content={simulation}
+							config={rendererConfig}
 						/>
 					) : (
 						<div className="flex h-full w-full items-center justify-center">
@@ -119,6 +121,7 @@ export function Playground({
 						onNodesChange={onNodesChange}
 						nodeTypes={nodeTypes}
 						content={simulation}
+						config={rendererConfig}
 					/>
 				</ResizablePanel>
 			</ResizablePanelGroup>

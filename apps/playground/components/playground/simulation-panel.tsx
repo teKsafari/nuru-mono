@@ -21,6 +21,7 @@ interface SimulationPanelProps {
 	onNodesChange?: OnNodesChange;
 	nodeTypes?: NodeTypes;
 	content?: React.ReactNode;
+	config?: any;
 }
 
 export function SimulationPanel({
@@ -29,12 +30,17 @@ export function SimulationPanel({
 	onNodesChange,
 	nodeTypes,
 	content,
+	config,
 }: SimulationPanelProps) {
 	const [is3D, setIs3D] = useState(false);
 
 	if (is3D) {
 		return (
-			<SimulationPanel3D nodes={nodes} onToggleView={() => setIs3D(false)} />
+			<SimulationPanel3D
+				nodes={nodes}
+				onToggleView={() => setIs3D(false)}
+				config={config}
+			/>
 		);
 	}
 
