@@ -1,3 +1,5 @@
+main.wasm
+
 # Ignore binary files, if any
 main
 main.exe
