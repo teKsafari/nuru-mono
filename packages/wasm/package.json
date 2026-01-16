@@ -1,6 +1,6 @@
 {
 	"name": "@nuru/wasm",
-	"version": "0.5.18",
+	"version": "0.5.19",
 	"description": "A wasm compiler/intepreter for [Nuru](https://github.com/NuruProgramming/Nuru)",
 	"main": "dist/index.js",
 	"files": [
