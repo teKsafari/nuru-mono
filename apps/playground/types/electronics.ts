@@ -1,4 +1,4 @@
-// Gpio is the base interface for hardware pins
+// Gpio is the base interface for I/O hardware pins
 export interface Gpio {
 	pin: number;
 	isEnabled: boolean;

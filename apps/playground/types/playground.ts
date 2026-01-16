@@ -1,4 +1,5 @@
 import React from "react";
+import type { Node, Edge, NodeTypes, OnNodesChange } from "@xyflow/react";
 
 export interface LanguageExecutor {
 	language: string;
@@ -14,10 +15,19 @@ export interface LessonContent {
 	description: React.ReactNode;
 	initialCode: string;
 	simulation?: React.ReactNode;
+	// New ReactFlow props
+	initialNodes?: Node[];
+	initialEdges?: Edge[];
+	nodeTypes?: NodeTypes;
 }
 
 export interface PlaygroundProps {
 	lesson: LessonContent;
 	executor: LanguageExecutor;
 	simulation?: React.ReactNode;
+	// New ReactFlow props
+	nodes?: Node[];
+	edges?: Edge[];
+	onNodesChange?: OnNodesChange;
+	nodeTypes?: NodeTypes;
 }

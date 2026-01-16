@@ -1,14 +1,18 @@
 {
 	"name": "@nuru/wasm",
-	"version": "1.0.0",
-	"private": true,
+	"version": "0.5.19",
 	"description": "A wasm compiler/intepreter for [Nuru](https://github.com/NuruProgramming/Nuru)",
-	"main": "wasm_exec.js",
+	"main": "dist/index.js",
+	"files": [
+		"dist",
+		"main.wasm"
+	],
 	"scripts": {
 		"setup": "bash setup.sh",
 		"test": "echo \"Mocktest Wasm-core  🟢 🟢 🟢 🟢\" && exit 0 >> /dev/null",
 		"build:wasm": "pnpm run replace && GOOS=js GOARCH=wasm tinygo build -o main.wasm",
 		"build": "tsc",
+		"prepublishOnly": "npm run build:wasm && npm run build",
 		"dev": "tsc --watch & go run cmd/server/main.go",
 		"replace": "cp -r ./modified/* ./deps/Nuru/"
 	},
@@ -24,11 +28,11 @@
 	"author": "Nehemia Kaaya <heracraft@teksafari.org>",
 	"license": "ISC",
 	"dependencies": {
-		"@types/golang-wasm-exec": "^1.15.2"
+		"@types/golang-wasm-exec": "^1.15.2",
+		"xss": "^1.0.15"
 	},
 	"devDependencies": {
 		"@types/node": "^22",
-		"typescript": "^5.9.3",
-		"xss": "^1.0.15"
+		"typescript": "^5.9.3"
 	}
 }

@@ -126,8 +126,7 @@ export default async function init(config: interpreterConfig): Promise<NuruInsta
 	outputReceiverRegistered=true
 
 	// let wasmBinaryUrl = "/main.wasm";
-	let wasmBinaryUrl = `http://localhost:7070/main.wasm`;
-	// let wasmBinaryUrl = `https://cdn.jsdelivr.net/gh/teKsafari/nuru-mono@${config.version}/packages/wasm/main.wasm`;
+	let wasmBinaryUrl = `https://cdn.jsdelivr.net/npm/@nuru/wasm@${config.version}/main.wasm`;
 
 	return new Promise<NuruInstance>(async (resolve, reject) => {
 		const go = new Go();
