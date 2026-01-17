@@ -1,2 +1,2 @@
-# nuru-electronic
-Electronic simulations for nuru pg
+# nuru-playground
+Interactive playground for nuru
