@@ -1,6 +1,9 @@
+main.wasm
+
 # Ignore binary files, if any
 main
 main.exe
 
 # Ignore vendor directory
 vendor/*
+deps/*

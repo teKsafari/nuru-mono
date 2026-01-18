@@ -8,13 +8,13 @@
 		"main.wasm"
 	],
 	"scripts": {
-		"setup": "go mod vendor",
+		"setup": "bash setup.sh",
 		"test": "echo \"Mocktest Wasm-core  🟢 🟢 🟢 🟢\" && exit 0 >> /dev/null",
-		"build:wasm": "pnpm run replace && GOOS=js GOARCH=wasm go build -mod=vendor -o main.wasm",
+		"build:wasm": "pnpm run replace && GOOS=js GOARCH=wasm tinygo build -o main.wasm",
 		"build": "tsc",
 		"prepublishOnly": "npm run build:wasm && npm run build",
-		"dev": "tsc --watch",
-		"replace": "cp -r ./modified/* ./vendor/github.com/NuruProgramming/Nuru/"
+		"dev": "tsc --watch & go run cmd/server/main.go",
+		"replace": "cp -r ./modified/* ./deps/Nuru/"
 	},
 	"type": "module",
 	"man": "./dist/index.js",
